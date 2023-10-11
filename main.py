@@ -159,6 +159,7 @@ def main():
     string = printers.to_csv(result, species, groups)
     with open(output_file, "w") as f:
         f.write(string)
+    print(f"Output written to {output_file}")
 
     end = time.time()
     print(f"{end - start:.2f}")
