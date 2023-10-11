@@ -133,7 +133,7 @@ def main():
     seqs, seqs_offsets, min_dist_0 = read_fasta(fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
-    result = [[(inf, -inf)] * (i + 1) for i, _ in enumerate(range(len(group_offsets)))]
+    result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     for g1 in range(len(group_offsets)):
         group = g1 + 1
         perc = group / n_groups * 100
