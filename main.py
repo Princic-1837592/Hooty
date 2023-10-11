@@ -133,9 +133,12 @@ def main():
     seqs, seqs_offsets, min_dist_0 = read_fasta(fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
-    result = [[(inf, -inf)] * (i + 1) for i, _ in enumerate(range(len(group_offsets)))]
-    for g1 in range(len(group_offsets)):
-        compute_group(g1, n_groups, min_dist_0[g1], seqs, seqs_offsets)
+    result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
+    for g1 in range(n_groups):
+        res = compute_group(g1, n_groups, min_dist_0[g1], seqs, seqs_offsets)
+        print(g1, len(res))
+        for g2, t in enumerate(res):
+            result[g2][g1] = t
 
     string = printers.to_csv(result, species, groups)
     with open(output_file, "w") as f:
@@ -146,7 +149,7 @@ def main():
 
 
 def compute_group(g1, n_groups, min_dist_0, seqs, seqs_offsets):
-    result = [(inf, -inf)] * (g1 + 1)
+    result = [(inf, -inf)] * (n_groups - g1)
     for g, g2 in enumerate(range(g1, n_groups)):
         g1_offset = seqs_offsets[g1]
         g2_offset = seqs_offsets[g2]
