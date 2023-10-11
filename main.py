@@ -134,12 +134,12 @@ def main():
     print(f"Number of sequences: {len(seqs)}")
 
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
-    for g1 in range(len(group_offsets)):
+    for g1 in range(n_groups):
         group = g1 + 1
         perc = group / n_groups * 100
         eta = (time.time() - start) / group * (n_groups - g1 - 1)
         print(f"Group {group} ({perc:.2f}% ETA: {eta:.2f}s)")
-        for g2 in range(g1, len(group_offsets)):
+        for g2 in range(g1, n_groups):
             g1_offset = seqs_offsets[g1]
             g2_offset = seqs_offsets[g2]
             min_score, max_score = inf, -inf
