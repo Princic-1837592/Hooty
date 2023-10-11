@@ -4,7 +4,6 @@ import time
 from dataclasses import dataclass
 from math import inf
 from multiprocessing import cpu_count, Process, Pipe
-from multiprocessing.connection import Connection
 from typing import List, Tuple, Optional
 
 import printers
@@ -33,8 +32,8 @@ class Offset:
 @dataclass
 class ProcessData:
     process: Process
-    father: Connection
-    son: Connection
+    father: ...
+    son: ...
     chunk: List[int]
 
 
@@ -163,16 +162,13 @@ def main():
         p.start()
         processes.append(ProcessData(p, father, son, chunk))
     for p, pdata in enumerate(processes):
-        print("receiving")
         p_result = pdata.father.recv()
-        print("received", len(p_result), "results")
         for g1_0, g1 in enumerate(pdata.chunk):
             for g2_0, g2 in enumerate(range(g1, n_groups)):
                 result[g2][g1] = p_result[g1_0][g2_0]
         pdata.father.close()
         pdata.son.close()
         pdata.process.join()
-        print("joined")
 
     string = printers.to_csv(result, species, groups)
     with open(output_file, "w") as f:
@@ -201,9 +197,7 @@ def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
             if g1 == g2 and min_dist_0:
                 min_score = 0.0
             result[g1_0][g2_0] = (min_score, max_score)
-    print(os.getpid(), "sending")
     pipe.send(result)
-    print(os.getpid(), "sent")
 
 
 if __name__ == "__main__":
