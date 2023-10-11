@@ -3,10 +3,11 @@ import sys
 import time
 from dataclasses import dataclass
 from math import inf
+from multiprocessing import cpu_count, Process
 from typing import List, Tuple, Optional
 
-from distances import K2Pdistance
 import printers
+from distances import K2Pdistance
 
 
 @dataclass
@@ -109,7 +110,7 @@ def main():
     start = time.time()
 
     if len(sys.argv) < 3:
-        print("Usage: python main.py <fasta_file> <species_file> [output_file]")
+        print("Usage: python main.py <fasta_file> <species_file> [output_file] [processes]")
         return
 
     fasta_file, species_file = sys.argv[1], sys.argv[2]
@@ -124,6 +125,9 @@ def main():
         output_file = sys.argv[3]
     else:
         print(f"Warning: no output file specified, using default {output_file}")
+    p_count = cpu_count()
+    if len(sys.argv) > 4:
+        p_count = int(sys.argv[4])
 
     species, groups, group_offsets = read_species(species_file)
     n_groups = len(group_offsets)
@@ -134,10 +138,16 @@ def main():
     print(f"Number of sequences: {len(seqs)}")
 
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
-    for g1 in range(n_groups):
-        res = compute_group(g1, n_groups, min_dist_0[g1], seqs, seqs_offsets)
-        for g2, t in enumerate(res):
-            result[g2 + g1][g1] = t
+    processes = []
+    # todo split groups in chunks using p_count
+    chunks = []
+    for g, chunk in enumerate(chunks):
+        p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0[g], seqs, seqs_offsets, result))
+        p.start()
+        processes.append(p)
+    for p in processes:
+        p.join()
+        print("joined")
 
     string = printers.to_csv(result, species, groups)
     with open(output_file, "w") as f:
@@ -147,9 +157,8 @@ def main():
     print(f"{end - start:.2f}")
 
 
-def compute_group(g1, n_groups, min_dist_0, seqs, seqs_offsets):
-    result = [(inf, -inf)] * (n_groups - g1)
-    for g, g2 in enumerate(range(g1, n_groups)):
+def compute_group(g1, n_groups, min_dist_0, seqs, seqs_offsets, result):
+    for g2 in range(g1, n_groups):
         g1_offset = seqs_offsets[g1]
         g2_offset = seqs_offsets[g2]
         min_score, max_score = inf, -inf
@@ -164,7 +173,7 @@ def compute_group(g1, n_groups, min_dist_0, seqs, seqs_offsets):
                     max_score = distance
         if g1 == g2 and min_dist_0:
             min_score = 0.0
-        result[g] = (min_score, max_score)
+        result[g2 + g1][g1] = (min_score, max_score)
     return result
 
 
