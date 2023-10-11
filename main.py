@@ -136,9 +136,8 @@ def main():
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     for g1 in range(n_groups):
         res = compute_group(g1, n_groups, min_dist_0[g1], seqs, seqs_offsets)
-        print(g1, len(res))
         for g2, t in enumerate(res):
-            result[g2][g1] = t
+            result[g2 + g1][g1] = t
 
     string = printers.to_csv(result, species, groups)
     with open(output_file, "w") as f:
