@@ -133,14 +133,25 @@ def main():
     n_groups = len(group_offsets)
     print(f"Number of species: {len(species)}")
     print(f"Number of groups: {n_groups}")
+    if p_count > n_groups:
+        p_count = n_groups
 
     seqs, seqs_offsets, min_dist_0 = read_fasta(fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
+    # todo split groups in chunks using p_count
+    numbers = list(range(n_groups))
+    print(f"Working with {p_count} processes")
+    groups_per_chunk = n_groups // p_count
+    print(f"Groups per process: {groups_per_chunk}")
+    chunks = [numbers[i:i + groups_per_chunk] for i in range(0, n_groups, groups_per_chunk)]
+    print(f"Starting {len(chunks)} == {p_count} processes")
+    print(chunks[-1])
+    if len(chunks) > p_count:
+        chunks[-2].extend(chunks[-1])
+        chunks.pop()
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     processes = []
-    # todo split groups in chunks using p_count
-    chunks = []
     for g, chunk in enumerate(chunks):
         p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0[g], seqs, seqs_offsets, result))
         p.start()
@@ -157,23 +168,25 @@ def main():
     print(f"{end - start:.2f}")
 
 
-def compute_group(g1, n_groups, min_dist_0, seqs, seqs_offsets, result):
-    for g2 in range(g1, n_groups):
-        g1_offset = seqs_offsets[g1]
-        g2_offset = seqs_offsets[g2]
-        min_score, max_score = inf, -inf
-        for i in range(g1_offset.offset, g1_offset.offset + g1_offset.count):
-            for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
-                if i == j:
-                    continue
-                distance = K2Pdistance(seqs[i].seq, seqs[j].seq)
-                if distance < min_score:
-                    min_score = distance
-                if distance > max_score:
-                    max_score = distance
-        if g1 == g2 and min_dist_0:
-            min_score = 0.0
-        result[g2 + g1][g1] = (min_score, max_score)
+def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, result):
+    print(os.getpid(), groups)
+    for g1 in groups:
+        for g2 in range(g1, n_groups):
+            g1_offset = seqs_offsets[g1]
+            g2_offset = seqs_offsets[g2]
+            min_score, max_score = inf, -inf
+            for i in range(g1_offset.offset, g1_offset.offset + g1_offset.count):
+                for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
+                    if i == j:
+                        continue
+                    distance = K2Pdistance(seqs[i].seq, seqs[j].seq)
+                    if distance < min_score:
+                        min_score = distance
+                    if distance > max_score:
+                        max_score = distance
+            if g1 == g2 and min_dist_0:
+                min_score = 0.0
+            result[g2][g1] = (min_score, max_score)
     return result
 
 
