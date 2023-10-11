@@ -135,26 +135,7 @@ def main():
 
     result = [[(inf, -inf)] * (i + 1) for i, _ in enumerate(range(len(group_offsets)))]
     for g1 in range(len(group_offsets)):
-        group = g1 + 1
-        perc = group / n_groups * 100
-        eta = (time.time() - start) / group * (n_groups - g1 - 1)
-        print(f"Group {group} ({perc:.2f}% ETA: {eta:.2f}s)")
-        for g2 in range(g1, len(group_offsets)):
-            g1_offset = seqs_offsets[g1]
-            g2_offset = seqs_offsets[g2]
-            min_score, max_score = inf, -inf
-            for i in range(g1_offset.offset, g1_offset.offset + g1_offset.count):
-                for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
-                    if i == j:
-                        continue
-                    distance = K2Pdistance(seqs[i].seq, seqs[j].seq)
-                    if distance < min_score:
-                        min_score = distance
-                    if distance > max_score:
-                        max_score = distance
-            if g1 == g2 and min_dist_0[g1]:
-                min_score = 0.0
-            result[g2][g1] = (min_score, max_score)
+        compute_group(g1, n_groups, min_dist_0[g1], seqs, seqs_offsets)
 
     string = printers.to_csv(result, species, groups)
     with open(output_file, "w") as f:
@@ -162,6 +143,27 @@ def main():
 
     end = time.time()
     print(f"{end - start:.2f}")
+
+
+def compute_group(g1, n_groups, min_dist_0, seqs, seqs_offsets):
+    result = [(inf, -inf)] * (g1 + 1)
+    for g, g2 in enumerate(range(g1, n_groups)):
+        g1_offset = seqs_offsets[g1]
+        g2_offset = seqs_offsets[g2]
+        min_score, max_score = inf, -inf
+        for i in range(g1_offset.offset, g1_offset.offset + g1_offset.count):
+            for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
+                if i == j:
+                    continue
+                distance = K2Pdistance(seqs[i].seq, seqs[j].seq)
+                if distance < min_score:
+                    min_score = distance
+                if distance > max_score:
+                    max_score = distance
+        if g1 == g2 and min_dist_0:
+            min_score = 0.0
+        result[g] = (min_score, max_score)
+    return result
 
 
 if __name__ == "__main__":
