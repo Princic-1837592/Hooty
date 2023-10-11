@@ -3,7 +3,8 @@ import sys
 import time
 from dataclasses import dataclass
 from math import inf
-from multiprocessing import cpu_count, Process
+from multiprocessing import cpu_count, Process, Pipe
+from multiprocessing.connection import Connection
 from typing import List, Tuple, Optional
 
 import printers
@@ -27,6 +28,14 @@ class Sequence:
 class Offset:
     offset: int
     count: int
+
+
+@dataclass
+class ProcessData:
+    process: Process
+    father: Connection
+    son: Connection
+    chunk: List[int]
 
 
 def read_species(species_file) -> Optional[Tuple[List[str], List[int], List[int]]]:
@@ -139,25 +148,30 @@ def main():
     seqs, seqs_offsets, min_dist_0 = read_fasta(fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
-    # todo split groups in chunks using p_count
     numbers = list(range(n_groups))
-    print(f"Working with {p_count} processes")
     groups_per_chunk = n_groups // p_count
-    print(f"Groups per process: {groups_per_chunk}")
+    print(f"Working with {p_count} processes, {groups_per_chunk} groups per process")
     chunks = [numbers[i:i + groups_per_chunk] for i in range(0, n_groups, groups_per_chunk)]
-    print(f"Starting {len(chunks)} == {p_count} processes")
-    print(chunks[-1])
     if len(chunks) > p_count:
         chunks[-2].extend(chunks[-1])
         chunks.pop()
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     processes = []
     for g, chunk in enumerate(chunks):
-        p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0[g], seqs, seqs_offsets, result))
+        father, son = Pipe(False)
+        p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0[g], seqs, seqs_offsets, son))
         p.start()
-        processes.append(p)
-    for p in processes:
-        p.join()
+        processes.append(ProcessData(p, father, son, chunk))
+    for p, pdata in enumerate(processes):
+        print("receiving")
+        p_result = pdata.father.recv()
+        print("received", len(p_result), "results")
+        for g1_0, g1 in enumerate(pdata.chunk):
+            for g2_0, g2 in enumerate(range(g1, n_groups)):
+                result[g2][g1] = p_result[g1_0][g2_0]
+        pdata.father.close()
+        pdata.son.close()
+        pdata.process.join()
         print("joined")
 
     string = printers.to_csv(result, species, groups)
@@ -168,10 +182,10 @@ def main():
     print(f"{end - start:.2f}")
 
 
-def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, result):
-    print(os.getpid(), groups)
-    for g1 in groups:
-        for g2 in range(g1, n_groups):
+def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
+    result = [[(inf, -inf)] * (n_groups - group) for group in groups]
+    for g1_0, g1 in enumerate(groups):
+        for g2_0, g2 in enumerate(range(g1, n_groups)):
             g1_offset = seqs_offsets[g1]
             g2_offset = seqs_offsets[g2]
             min_score, max_score = inf, -inf
@@ -186,8 +200,10 @@ def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, result):
                         max_score = distance
             if g1 == g2 and min_dist_0:
                 min_score = 0.0
-            result[g2][g1] = (min_score, max_score)
-    return result
+            result[g1_0][g2_0] = (min_score, max_score)
+    print(os.getpid(), "sending")
+    pipe.send(result)
+    print(os.getpid(), "sent")
 
 
 if __name__ == "__main__":
