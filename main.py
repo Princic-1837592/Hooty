@@ -3,10 +3,11 @@ import sys
 import time
 from dataclasses import dataclass
 from math import inf
+from multiprocessing import cpu_count, Process, Pipe
 from typing import List, Tuple, Optional
 
-from distances import K2Pdistance
 import printers
+from distances import K2Pdistance
 
 
 @dataclass
@@ -26,6 +27,14 @@ class Sequence:
 class Offset:
     offset: int
     count: int
+
+
+@dataclass
+class ProcessData:
+    process: Process
+    father: ...
+    son: ...
+    chunk: List[int]
 
 
 def read_species(species_file) -> Optional[Tuple[List[str], List[int], List[int]]]:
@@ -109,7 +118,7 @@ def main():
     start = time.time()
 
     if len(sys.argv) < 3:
-        print("Usage: python main.py <fasta_file> <species_file> [output_file]")
+        print("Usage: python main.py <fasta_file> <species_file> [output_file] [processes]")
         return
 
     fasta_file, species_file = sys.argv[1], sys.argv[2]
@@ -124,22 +133,55 @@ def main():
         output_file = sys.argv[3]
     else:
         print(f"Warning: no output file specified, using default {output_file}")
+    p_count = cpu_count()
+    if len(sys.argv) > 4:
+        p_count = int(sys.argv[4])
 
     species, groups, group_offsets = read_species(species_file)
     n_groups = len(group_offsets)
     print(f"Number of species: {len(species)}")
     print(f"Number of groups: {n_groups}")
+    if p_count > n_groups:
+        p_count = n_groups
 
     seqs, seqs_offsets, min_dist_0 = read_fasta(fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
+    numbers = list(range(n_groups))
+    groups_per_chunk = n_groups // p_count
+    print(f"Working with {p_count} processes, {groups_per_chunk} groups per process")
+    chunks = [numbers[i:i + groups_per_chunk] for i in range(0, n_groups, groups_per_chunk)]
+    if len(chunks) > p_count:
+        chunks[-2].extend(chunks[-1])
+        chunks.pop()
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
-    for g1 in range(n_groups):
-        group = g1 + 1
-        perc = group / n_groups * 100
-        eta = (time.time() - start) / group * (n_groups - g1 - 1)
-        print(f"Group {group} ({perc:.2f}% ETA: {eta:.2f}s)")
-        for g2 in range(g1, n_groups):
+    processes = []
+    for g, chunk in enumerate(chunks):
+        father, son = Pipe(False)
+        p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0, seqs, seqs_offsets, son))
+        p.start()
+        processes.append(ProcessData(p, father, son, chunk))
+    for p, pdata in enumerate(processes):
+        p_result = pdata.father.recv()
+        for g1_0, g1 in enumerate(pdata.chunk):
+            for g2_0, g2 in enumerate(range(g1, n_groups)):
+                result[g2][g1] = p_result[g1_0][g2_0]
+        pdata.father.close()
+        pdata.son.close()
+        pdata.process.join()
+
+    string = printers.to_csv(result, species, groups)
+    with open(output_file, "w") as f:
+        f.write(string)
+
+    end = time.time()
+    print(f"{end - start:.2f}")
+
+
+def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
+    result = [[(inf, -inf)] * (n_groups - group) for group in groups]
+    for g1_0, g1 in enumerate(groups):
+        for g2_0, g2 in enumerate(range(g1, n_groups)):
             g1_offset = seqs_offsets[g1]
             g2_offset = seqs_offsets[g2]
             min_score, max_score = inf, -inf
@@ -157,15 +199,8 @@ def main():
                     min_score = 0.0
                 if g1_offset.count == 1:
                     max_score = 0.0
-            result[g2][g1] = (min_score, max_score)
-
-    string = printers.to_csv(result, species, groups)
-    with open(output_file, "w") as f:
-        f.write(string)
-    print(f"Output written to {output_file}")
-
-    end = time.time()
-    print(f"{end - start:.2f}")
+            result[g1_0][g2_0] = (min_score, max_score)
+    pipe.send(result)
 
 
 if __name__ == "__main__":
