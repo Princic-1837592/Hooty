@@ -12,7 +12,7 @@ TRANSITIONS = [
 
 
 # https://github.com/kgori/python_tools_on_github/blob/master/pairwise_distances.py
-def K2Pdistance(seq1, seq2):
+def K2P_distance(seq1, seq2):
     """
     Kimura 2-Parameter distance = -0.5 log( (1 - 2p -q) * sqrt( 1 - 2q ) )
     where:

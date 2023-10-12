@@ -6,7 +6,7 @@ from math import inf
 from multiprocessing import Pipe, Process, cpu_count
 
 import printers
-from distances import K2Pdistance
+from distances import K2P_distance
 import bases
 
 
@@ -239,7 +239,7 @@ def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
                 for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
                     if i == j:
                         continue
-                    distance = K2Pdistance(seqs[i].seq, seqs[j].seq)
+                    distance = K2P_distance(seqs[i].seq, seqs[j].seq)
                     if distance < min_score:
                         min_score = distance
                     if distance > max_score:
