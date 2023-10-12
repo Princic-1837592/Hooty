@@ -152,8 +152,11 @@ def main():
                         min_score = distance
                     if distance > max_score:
                         max_score = distance
-            if g1 == g2 and min_dist_0[g1]:
-                min_score = 0.0
+            if g1 == g2:
+                if min_dist_0[g1]:
+                    min_score = 0.0
+                if g1_offset.count == 1:
+                    max_score = 0.0
             result[g2][g1] = (min_score, max_score)
 
     string = printers.to_csv(result, species, groups)
