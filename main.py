@@ -142,6 +142,13 @@ def main():
         metavar="processes",
         dest="processes"
     )
+    parser.add_argument(
+        "-a",
+        "--ambiguous",
+        action="store_true",
+        help="count ambiguous bases",
+        dest="ambiguous"
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.fasta_file):
