@@ -4,6 +4,7 @@ import time
 from dataclasses import dataclass
 from math import inf
 from multiprocessing import cpu_count, Process, Pipe
+from re import search, compile
 from typing import List, Tuple, Optional
 
 import printers
@@ -80,25 +81,27 @@ def read_fasta(fasta_file, species: List[str], groups: List[int]) -> Optional[
 
     seqs = set()
     min_dist_0 = [False for _ in range(groups[-1] + 1)]
+    patterns = list(map(lambda s: compile(rf"\b{s}\b"), species))
     for l in range(0, len(lines), 2):
         name = lines[l][1:].strip()
         of_groups = set()
-        for i, s in enumerate(species):
-            if s in name:
+        for i, pattern in enumerate(patterns):
+            if search(pattern, name):
                 of_groups.add(groups[i])
-        n_groups = len(of_groups)
-        if n_groups == 1:
+        of_n_groups = len(of_groups)
+        if of_n_groups == 1:
             old_len = len(seqs)
             of_group = of_groups.pop()
             seqs.add(Sequence(of_group, name, lines[l + 1].strip()))
             if len(seqs) == old_len:
                 min_dist_0[of_group] = True
-        elif n_groups > 1:
+        elif of_n_groups > 1:
             pass
-            # print("Warning: species of sequence is not unique")
-        elif n_groups == 0:
+            # of_species = ", ".join(map(lambda g: species[g], of_groups))
+            # print(f"Warning: species of sequence is not unique. Found matches for: {of_species}")
+        elif of_n_groups == 0:
             pass
-            # print("Warning: species of sequence not found")
+            print("Warning: species of sequence not found")
     seqs = list(seqs)
 
     if any(len(seq.seq) != len(seqs[0].seq) for seq in seqs):
