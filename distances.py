@@ -23,16 +23,12 @@ def K2Pdistance(seq1, seq2):
 
     # collect ungapped pairs
     for x in zip(seq1, seq2):
-        if bases.GAP not in x and bases.N not in x:
+        if x[0] <= bases.T and x[1] <= bases.T:
             pairs.append(x)
 
     ts_count = 0
     tv_count = 0
     length = len(pairs)
-
-    transitions = ["AG", "GA", "CT", "TC"]
-    transversions = ["AC", "CA", "AT", "TA",
-                     "GC", "CG", "GT", "TG"]
 
     for (x, y) in filter(lambda p: p[0] != p[1], pairs):
         ts_count += TRANSITIONS[x][y]
