@@ -158,7 +158,7 @@ def main():
     processes = []
     for g, chunk in enumerate(chunks):
         father, son = Pipe(False)
-        p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0[g], seqs, seqs_offsets, son))
+        p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0, seqs, seqs_offsets, son))
         p.start()
         processes.append(ProcessData(p, father, son, chunk))
     for p, pdata in enumerate(processes):
