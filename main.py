@@ -195,7 +195,7 @@ def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
                     if distance > max_score:
                         max_score = distance
             if g1 == g2:
-                if min_dist_0:
+                if min_dist_0[g1]:
                     min_score = 0.0
                 if g1_offset.count == 1:
                     max_score = 0.0
