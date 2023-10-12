@@ -191,6 +191,9 @@ def main():
     seqs, seqs_offsets, min_dist_0 = read_fasta(args.fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
+    probabilities = None
+    if args.ambiguous:
+        probabilities = compute_probabilities(seqs)
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     if args.processes == 1:
         p_result = compute_groups(range(n_groups), n_groups, min_dist_0, seqs, seqs_offsets, None)
@@ -253,6 +256,10 @@ def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
     if pipe is None:
         return result
     pipe.send(result)
+
+
+def compute_probabilities():
+    pass
 
 
 if __name__ == "__main__":
