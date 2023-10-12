@@ -147,28 +147,34 @@ def main():
     seqs, seqs_offsets, min_dist_0 = read_fasta(fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
-    numbers = list(range(n_groups))
-    groups_per_chunk = n_groups // p_count
-    print(f"Working with {p_count} processes, {groups_per_chunk} groups per process")
-    chunks = [numbers[i:i + groups_per_chunk] for i in range(0, n_groups, groups_per_chunk)]
-    if len(chunks) > p_count:
-        chunks[-2].extend(chunks[-1])
-        chunks.pop()
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
-    processes = []
-    for g, chunk in enumerate(chunks):
-        father, son = Pipe(False)
-        p = Process(target=compute_group, args=(chunk, n_groups, min_dist_0, seqs, seqs_offsets, son))
-        p.start()
-        processes.append(ProcessData(p, father, son, chunk))
-    for p, pdata in enumerate(processes):
-        p_result = pdata.father.recv()
-        for g1_0, g1 in enumerate(pdata.chunk):
+    if p_count == 1:
+        p_result = compute_groups(range(n_groups), n_groups, min_dist_0, seqs, seqs_offsets, None)
+        for g1 in range(n_groups):
             for g2_0, g2 in enumerate(range(g1, n_groups)):
-                result[g2][g1] = p_result[g1_0][g2_0]
-        pdata.father.close()
-        pdata.son.close()
-        pdata.process.join()
+                result[g2][g1] = p_result[g1][g2_0]
+    else:
+        numbers = list(range(n_groups))
+        groups_per_chunk = n_groups // p_count
+        print(f"Working with {p_count} processes, {groups_per_chunk} groups per process")
+        chunks = [numbers[i:i + groups_per_chunk] for i in range(0, n_groups, groups_per_chunk)]
+        if len(chunks) > p_count:
+            chunks[-2].extend(chunks[-1])
+            chunks.pop()
+        processes = []
+        for g, chunk in enumerate(chunks):
+            father, son = Pipe(False)
+            p = Process(target=compute_groups, args=(chunk, n_groups, min_dist_0, seqs, seqs_offsets, son))
+            p.start()
+            processes.append(ProcessData(p, father, son, chunk))
+        for p, pdata in enumerate(processes):
+            p_result = pdata.father.recv()
+            for g1_0, g1 in enumerate(pdata.chunk):
+                for g2_0, g2 in enumerate(range(g1, n_groups)):
+                    result[g2][g1] = p_result[g1_0][g2_0]
+            pdata.father.close()
+            pdata.son.close()
+            pdata.process.join()
 
     string = printers.to_csv(result, species, groups)
     with open(output_file, "w") as f:
@@ -178,7 +184,7 @@ def main():
     print(f"{end - start:.2f}")
 
 
-def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
+def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
     result = [[(inf, -inf)] * (n_groups - group) for group in groups]
     for g1_0, g1 in enumerate(groups):
         for g2_0, g2 in enumerate(range(g1, n_groups)):
@@ -200,6 +206,8 @@ def compute_group(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
                 if g1_offset.count == 1:
                     max_score = 0.0
             result[g1_0][g2_0] = (min_score, max_score)
+    if pipe is None:
+        return result
     pipe.send(result)
 
 
