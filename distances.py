@@ -1,5 +1,15 @@
 from math import nan, log, sqrt
 
+import bases
+
+TRANSITIONS = [
+    # A  C  G  T
+    [0, 0, 1, 0],
+    [0, 0, 0, 0],
+    [1, 0, 0, 1],
+    [0, 0, 1, 0],
+]
+
 
 # https://github.com/kgori/python_tools_on_github/blob/master/pairwise_distances.py
 def K2Pdistance(seq1, seq2):
@@ -13,7 +23,7 @@ def K2Pdistance(seq1, seq2):
 
     # collect ungapped pairs
     for x in zip(seq1, seq2):
-        if '-' not in x and 'N' not in x:
+        if bases.GAP not in x and bases.N not in x:
             pairs.append(x)
 
     ts_count = 0
@@ -24,11 +34,9 @@ def K2Pdistance(seq1, seq2):
     transversions = ["AC", "CA", "AT", "TA",
                      "GC", "CG", "GT", "TG"]
 
-    for (x, y) in pairs:
-        if x + y in transitions:
-            ts_count += 1
-        elif x + y in transversions:
-            tv_count += 1
+    for (x, y) in filter(lambda p: p[0] != p[1], pairs):
+        ts_count += TRANSITIONS[x][y]
+        tv_count += 1 - TRANSITIONS[x][y]
 
     p = float(ts_count) / length
     q = float(tv_count) / length

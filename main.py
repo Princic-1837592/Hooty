@@ -4,17 +4,17 @@ from argparse import ArgumentParser
 from dataclasses import dataclass
 from math import inf
 from multiprocessing import Pipe, Process, cpu_count
-from typing import List, Optional, Tuple
 
 import printers
 from distances import K2Pdistance
+import bases
 
 
 @dataclass
 class Sequence:
     group: int
     name: str
-    seq: str
+    seq: bytes
 
     def __hash__(self):
         return hash((self.group, self.seq))
@@ -34,10 +34,10 @@ class ProcessData:
     process: Process
     father: ...
     son: ...
-    chunk: List[int]
+    chunk: list[int]
 
 
-def read_species(species_file) -> Optional[Tuple[List[str], List[int], List[int]]]:
+def read_species(species_file) -> tuple[list[str], list[int], list[int]] | None:
     species = []
     groups = []
     offsets = []
@@ -67,9 +67,31 @@ def convert_to_single_lines(lines):
     return result
 
 
-def read_fasta(fasta_file, species: List[str], groups: List[int]) -> Optional[
-    Tuple[List[Sequence], List[Offset], List[bool]]
-]:
+bytes_map = {
+    "A": bases.A,
+    "C": bases.C,
+    "G": bases.G,
+    "T": bases.T,
+    "W": bases.W,
+    "S": bases.S,
+    "M": bases.M,
+    "K": bases.K,
+    "R": bases.R,
+    "Y": bases.Y,
+    "B": bases.B,
+    "D": bases.D,
+    "H": bases.H,
+    "V": bases.V,
+    "N": bases.N,
+    "-": bases.GAP,
+}
+
+
+def to_bytes(sequence: str) -> bytes:
+    return bytes(map(lambda c: bytes_map[c], sequence))
+
+
+def read_fasta(fasta_file, species, groups) -> tuple[list[Sequence], list[Offset], list[bool]] | None:
     with open(fasta_file, "r") as f:
         lines = f.read().strip().splitlines()
     # if len(lines) % 2 != 0:
@@ -90,7 +112,7 @@ def read_fasta(fasta_file, species: List[str], groups: List[int]) -> Optional[
         if of_n_groups == 1:
             old_len = len(seqs)
             of_group = of_groups.pop()
-            seqs.add(Sequence(of_group, name, lines[l + 1].strip()))
+            seqs.add(Sequence(of_group, name, to_bytes(lines[l + 1].strip())))
             if len(seqs) == old_len:
                 min_dist_0[of_group] = True
         elif of_n_groups > 1:
@@ -145,6 +167,7 @@ def main():
     parser.add_argument(
         "-a",
         "--ambiguous",
+        default=False,
         action="store_true",
         help="count ambiguous bases",
         dest="ambiguous"
