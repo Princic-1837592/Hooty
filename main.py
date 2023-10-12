@@ -1,6 +1,6 @@
 import os
-import sys
 import time
+from argparse import ArgumentParser
 from dataclasses import dataclass
 from math import inf
 from multiprocessing import Pipe, Process, cpu_count
@@ -118,48 +118,61 @@ def read_fasta(fasta_file, species: List[str], groups: List[int]) -> Optional[
 def main():
     start = time.time()
 
-    if len(sys.argv) < 3:
-        print("Usage: python main.py <fasta_file> <species_file> [output_file] [processes]")
-        return
+    parser = ArgumentParser()
+    parser.add_argument("fasta_file")
+    parser.add_argument("species_file")
+    parser.add_argument(
+        "-o",
+        "--output",
+        default="output.txt",
+        metavar="output file",
+        dest="output_file"
+    )
+    parser.add_argument(
+        "-l",
+        "--log",
+        default="log.txt",
+        metavar="log file",
+        dest="log_file"
+    )
+    parser.add_argument(
+        "-p",
+        "--processes",
+        default=cpu_count(),
+        metavar="processes",
+        dest="processes"
+    )
+    args = parser.parse_args()
 
-    fasta_file, species_file = sys.argv[1], sys.argv[2]
-    if not os.path.exists(fasta_file):
+    if not os.path.exists(args.fasta_file):
         print("Error: fasta file does not exist")
         return
-    if not os.path.exists(species_file):
+    if not os.path.exists(args.species_file):
         print("Error: species file does not exist")
         return
-    output_file = "output.txt"
-    if len(sys.argv) > 3:
-        output_file = sys.argv[3]
-    else:
-        print(f"Warning: no output file specified, using default {output_file}")
-    p_count = cpu_count()
-    if len(sys.argv) > 4:
-        p_count = int(sys.argv[4])
 
-    species, groups, group_offsets = read_species(species_file)
+    species, groups, group_offsets = read_species(args.species_file)
     n_groups = len(group_offsets)
     print(f"Number of species: {len(species)}")
     print(f"Number of groups: {n_groups}")
-    if p_count > n_groups:
-        p_count = n_groups
+    if args.processes > n_groups:
+        args.processes = n_groups
 
-    seqs, seqs_offsets, min_dist_0 = read_fasta(fasta_file, species, groups)
+    seqs, seqs_offsets, min_dist_0 = read_fasta(args.fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
-    if p_count == 1:
+    if args.processes == 1:
         p_result = compute_groups(range(n_groups), n_groups, min_dist_0, seqs, seqs_offsets, None)
         for g1 in range(n_groups):
             for g2_0, g2 in enumerate(range(g1, n_groups)):
                 result[g2][g1] = p_result[g1][g2_0]
     else:
         numbers = list(range(n_groups))
-        groups_per_chunk = n_groups // p_count
-        print(f"Working with {p_count} processes, {groups_per_chunk} groups per process")
+        groups_per_chunk = n_groups // args.processes
+        print(f"Working with {args.processes} processes, {groups_per_chunk} groups per process")
         chunks = [numbers[i:i + groups_per_chunk] for i in range(0, n_groups, groups_per_chunk)]
-        if len(chunks) > p_count:
+        if len(chunks) > args.processes:
             chunks[-2].extend(chunks[-1])
             chunks.pop()
         processes = []
@@ -178,7 +191,7 @@ def main():
             pdata.process.join()
 
     string = printers.to_csv(result, species, groups)
-    with open(output_file, "w") as f:
+    with open(args.output_file, "w") as f:
         f.write(string)
 
     end = time.time()
