@@ -265,7 +265,8 @@ def compute_frequency(seqs: list[Sequence], n_groups) -> list[list[Frequency]]:
                 result[seq.group][i].ambiguous_count += 1
     for group in result:
         for freq in group:
-            freq.frequency = [c / freq.normal_count for c in freq.count]
+            if freq.normal_count > 0:
+                freq.frequency = [c / freq.normal_count for c in freq.count]
     return result
 
 
