@@ -174,7 +174,8 @@ def main():
 
     probabilities = None
     if args.ambiguous:
-        probabilities = compute_probabilities(seqs)
+        probabilities = compute_probabilities(seqs, groups, n_groups)
+
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     if args.processes == 1:
         p_result = compute_groups(range(n_groups), n_groups, min_dist_0, seqs, seqs_offsets, None)
@@ -239,8 +240,33 @@ def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
     pipe.send(result)
 
 
-def compute_probabilities():
-    pass
+@dataclass
+class Frequency:
+    count: list[int]
+    frequency: list[float]
+    normal_count: int
+    ambiguous_count: int
+
+    def __init__(self):
+        self.count = [0 for _ in range(4)]
+        self.frequency = []
+        self.normal_count = 0
+        self.ambiguous_count = 0
+
+
+def compute_probabilities(seqs: list[Sequence], n_groups) -> list[list[Frequency]]:
+    result = [[Frequency() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
+    for seq in seqs:
+        for i, base in enumerate(seq.seq):
+            if base <= bases.T:
+                result[seq.group][i].count[base] += 1
+                result[seq.group][i].normal_count += 1
+            elif base < bases.N:
+                result[seq.group][i].ambiguous_count += 1
+    for group in result:
+        for freq in group:
+            freq.frequency = [c / freq.normal_count for c in freq.count]
+    return result
 
 
 if __name__ == "__main__":
