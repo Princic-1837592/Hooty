@@ -178,13 +178,14 @@ def main():
         args.processes = n_groups
 
     seqs = read_fasta(args.fasta_file, species, groups)
-    print(f"Number of sequences: {len(seqs)}")
+    print(f"Number of sequences with duplicates: {len(seqs)}")
 
     frequency = None
     if args.ambiguous:
         frequency = compute_frequency(seqs, n_groups)
 
     seqs, seqs_offsets, min_dist_0 = remove_duplicates(seqs, n_groups)
+    print(f"Number of sequences without duplicates: {len(seqs)}")
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     if args.processes == 1:
         p_result = compute_groups(range(n_groups), n_groups, min_dist_0, seqs, seqs_offsets, None)
