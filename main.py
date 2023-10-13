@@ -99,7 +99,8 @@ def read_fasta(fasta_file, species, groups) -> tuple[list[Sequence], list[Offset
         elif of_n_groups > 1:
             of_species = ", ".join(map(lambda g: species[g], of_groups))
             print(f"Error: species of sequence is not unique. Found matches for: {of_species}")
-            exit(1)
+            # todo
+            # exit(1)
         elif of_n_groups == 0:
             # print(f"Warning: match not found for sequence '{name}'")
             pass
