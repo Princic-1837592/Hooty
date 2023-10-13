@@ -172,9 +172,9 @@ def main():
     seqs, seqs_offsets, min_dist_0 = read_fasta(args.fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
-    probabilities = None
+    frequency = None
     if args.ambiguous:
-        probabilities = compute_probabilities(seqs, groups, n_groups)
+        frequency = compute_frequency(seqs, n_groups)
 
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     if args.processes == 1:
@@ -254,7 +254,7 @@ class Frequency:
         self.ambiguous_count = 0
 
 
-def compute_probabilities(seqs: list[Sequence], n_groups) -> list[list[Frequency]]:
+def compute_frequency(seqs: list[Sequence], n_groups) -> list[list[Frequency]]:
     result = [[Frequency() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
     for seq in seqs:
         for i, base in enumerate(seq.seq):
