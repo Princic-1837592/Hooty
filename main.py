@@ -5,9 +5,10 @@ from dataclasses import dataclass
 from math import inf
 from multiprocessing import Pipe, Process, cpu_count
 
-import printers
-from distances import K2P_distance
 import bases
+import printers
+from bases import BYTES_MAP
+from distances import K2P_distance
 
 
 @dataclass
@@ -67,28 +68,8 @@ def convert_to_single_lines(lines):
     return result
 
 
-bytes_map = {
-    "A": bases.A,
-    "C": bases.C,
-    "G": bases.G,
-    "T": bases.T,
-    "W": bases.W,
-    "S": bases.S,
-    "M": bases.M,
-    "K": bases.K,
-    "R": bases.R,
-    "Y": bases.Y,
-    "B": bases.B,
-    "D": bases.D,
-    "H": bases.H,
-    "V": bases.V,
-    "N": bases.N,
-    "-": bases.GAP,
-}
-
-
 def to_bytes(sequence: str) -> bytes:
-    return bytes(map(lambda c: bytes_map[c], sequence))
+    return bytes(map(lambda c: BYTES_MAP[c], sequence))
 
 
 def read_fasta(fasta_file, species, groups) -> tuple[list[Sequence], list[Offset], list[bool]] | None:

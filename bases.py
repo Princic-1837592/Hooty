@@ -14,3 +14,22 @@ H = 0xc
 V = 0xd
 N = 0xe
 GAP = 0x10
+
+BYTES_MAP = {
+    "A": A,
+    "C": C,
+    "G": G,
+    "T": T,
+    "W": W,
+    "S": S,
+    "M": M,
+    "K": K,
+    "R": R,
+    "Y": Y,
+    "B": B,
+    "D": D,
+    "H": H,
+    "V": V,
+    "N": N,
+    "-": GAP,
+}
