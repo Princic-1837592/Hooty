@@ -72,7 +72,7 @@ def to_bytes(sequence: str) -> bytes:
     return bytes(map(lambda c: BYTES_MAP[c], sequence))
 
 
-def read_fasta(fasta_file, species, groups) -> tuple[list[Sequence], list[Offset], list[bool]] | None:
+def read_fasta(fasta_file, species, groups) -> list[Sequence]:
     with open(fasta_file, "r") as f:
         lines = f.read().strip().splitlines()
     # if len(lines) % 2 != 0:
@@ -81,8 +81,7 @@ def read_fasta(fasta_file, species, groups) -> tuple[list[Sequence], list[Offset
     if lines[2][1] != ">":
         lines = convert_to_single_lines(lines)
 
-    seqs = set()
-    min_dist_0 = [False for _ in range(groups[-1] + 1)]
+    seqs = list()
     for l in range(0, len(lines), 2):
         name = lines[l][1:].strip()
         of_groups = set()
@@ -91,11 +90,8 @@ def read_fasta(fasta_file, species, groups) -> tuple[list[Sequence], list[Offset
                 of_groups.add(groups[i])
         of_n_groups = len(of_groups)
         if of_n_groups == 1:
-            old_len = len(seqs)
             of_group = of_groups.pop()
-            seqs.add(Sequence(of_group, name, to_bytes(lines[l + 1].strip())))
-            if len(seqs) == old_len:
-                min_dist_0[of_group] = True
+            seqs.append(Sequence(of_group, name, to_bytes(lines[l + 1].strip())))
         elif of_n_groups > 1:
             of_species = ", ".join(map(lambda g: species[g], of_groups))
             print(f"Error: species of sequence is not unique. Found matches for: {of_species}")
@@ -104,14 +100,25 @@ def read_fasta(fasta_file, species, groups) -> tuple[list[Sequence], list[Offset
         elif of_n_groups == 0:
             # print(f"Warning: match not found for sequence '{name}'")
             pass
-    seqs = list(seqs)
 
     if any(len(seq.seq) != len(seqs[0].seq) for seq in seqs):
         print("Error: sequences in fasta file are not of equal length")
         exit(1)
 
+    return seqs
+
+
+def remove_duplicates(seqs, n_groups) -> tuple[list[Sequence], list[Offset], list[bool]]:
+    min_dist_0 = [False for _ in range(n_groups)]
+    dedup = set()
+    for seq in seqs:
+        if seq not in dedup:
+            dedup.add(seq)
+        else:
+            min_dist_0[seq.group] = True
+    seqs = list(dedup)
     seqs.sort(key=lambda x: x.group)
-    offsets = [Offset(len(seqs), 0) for _ in range(groups[-1] + 1)]
+    offsets = [Offset(len(seqs), 0) for _ in range(n_groups)]
     for i, seq in enumerate(seqs):
         if offsets[seq.group].offset == len(seqs):
             offsets[seq.group].offset = i
@@ -170,13 +177,14 @@ def main():
     if args.processes > n_groups:
         args.processes = n_groups
 
-    seqs, seqs_offsets, min_dist_0 = read_fasta(args.fasta_file, species, groups)
+    seqs = read_fasta(args.fasta_file, species, groups)
     print(f"Number of sequences: {len(seqs)}")
 
     frequency = None
     if args.ambiguous:
         frequency = compute_frequency(seqs, n_groups)
 
+    seqs, seqs_offsets, min_dist_0 = remove_duplicates(seqs, n_groups)
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     if args.processes == 1:
         p_result = compute_groups(range(n_groups), n_groups, min_dist_0, seqs, seqs_offsets, None)
