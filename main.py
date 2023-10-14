@@ -8,7 +8,7 @@ from multiprocessing import Pipe, Process, cpu_count
 import bases
 import printers
 from bases import BYTES_MAP
-from distances import K2P_distance
+from distances import K2P_distance, K2P_distance_ambiguity
 
 
 @dataclass
@@ -36,6 +36,20 @@ class ProcessData:
     father: ...
     son: ...
     chunk: list[int]
+
+
+@dataclass
+class Frequencies:
+    count: list[int]
+    frequencies: list[float]
+    normal_count: int
+    ambiguous_count: int
+
+    def __init__(self):
+        self.count = [0 for _ in range(4)]
+        self.frequencies = []
+        self.normal_count = 0
+        self.ambiguous_count = 0
 
 
 def read_species(species_file) -> tuple[list[str], list[int], list[int]] | None:
@@ -126,6 +140,22 @@ def remove_duplicates(seqs, n_groups) -> tuple[list[Sequence], list[Offset], lis
     return seqs, offsets, min_dist_0
 
 
+def compute_frequencies(seqs: list[Sequence], n_groups) -> list[list[Frequencies]]:
+    result = [[Frequencies() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
+    for seq in seqs:
+        for i, base in enumerate(seq.seq):
+            if base <= bases.T:
+                result[seq.group][i].count[base] += 1
+                result[seq.group][i].normal_count += 1
+            elif base < bases.N:
+                result[seq.group][i].ambiguous_count += 1
+    for group in result:
+        for freq in group:
+            d = max(freq.normal_count, 1)
+            freq.frequencies = [c / d for c in freq.count]
+    return result
+
+
 def main():
     start = time.time()
 
@@ -180,15 +210,26 @@ def main():
     seqs = read_fasta(args.fasta_file, species, groups)
     print(f"Number of sequences with duplicates: {len(seqs)}")
 
-    frequency = None
+    frequencies = None
+    distance_f = K2P_distance
     if args.ambiguous:
-        frequency = compute_frequency(seqs, n_groups)
+        frequencies = compute_frequencies(seqs, n_groups)
+        distance_f = K2P_distance_ambiguity
 
     seqs, seqs_offsets, min_dist_0 = remove_duplicates(seqs, n_groups)
     print(f"Number of sequences without duplicates: {len(seqs)}")
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     if args.processes == 1:
-        p_result = compute_groups(range(n_groups), n_groups, min_dist_0, seqs, seqs_offsets, None)
+        p_result = compute_groups(
+            range(n_groups),
+            n_groups,
+            min_dist_0,
+            seqs,
+            seqs_offsets,
+            None,
+            distance_f,
+            frequencies
+        )
         for g1 in range(n_groups):
             for g2_0, g2 in enumerate(range(g1, n_groups)):
                 result[g2][g1] = p_result[g1][g2_0]
@@ -203,7 +244,10 @@ def main():
         processes = []
         for g, chunk in enumerate(chunks):
             father, son = Pipe(False)
-            p = Process(target=compute_groups, args=(chunk, n_groups, min_dist_0, seqs, seqs_offsets, son))
+            p = Process(
+                target=compute_groups,
+                args=(chunk, n_groups, min_dist_0, seqs, seqs_offsets, son, distance_f, frequencies)
+            )
             p.start()
             processes.append(ProcessData(p, father, son, chunk))
         for p, pdata in enumerate(processes):
@@ -223,7 +267,7 @@ def main():
     print(f"{end - start:.2f}")
 
 
-def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
+def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe, distance_f, frequencies):
     result = [[(inf, -inf)] * (n_groups - group) for group in groups]
     for g1_0, g1 in enumerate(groups):
         for g2_0, g2 in enumerate(range(g1, n_groups)):
@@ -234,7 +278,7 @@ def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
                 for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
                     if i == j:
                         continue
-                    distance = K2P_distance(seqs[i].seq, seqs[j].seq)
+                    distance = distance_f(seqs[i].seq, seqs[j].seq, frequencies)
                     if distance < min_score:
                         min_score = distance
                     if distance > max_score:
@@ -248,36 +292,6 @@ def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe):
     if pipe is None:
         return result
     pipe.send(result)
-
-
-@dataclass
-class Frequency:
-    count: list[int]
-    frequency: list[float]
-    normal_count: int
-    ambiguous_count: int
-
-    def __init__(self):
-        self.count = [0 for _ in range(4)]
-        self.frequency = []
-        self.normal_count = 0
-        self.ambiguous_count = 0
-
-
-def compute_frequency(seqs: list[Sequence], n_groups) -> list[list[Frequency]]:
-    result = [[Frequency() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
-    for seq in seqs:
-        for i, base in enumerate(seq.seq):
-            if base <= bases.T:
-                result[seq.group][i].count[base] += 1
-                result[seq.group][i].normal_count += 1
-            elif base < bases.N:
-                result[seq.group][i].ambiguous_count += 1
-    for group in result:
-        for freq in group:
-            if freq.normal_count > 0:
-                freq.frequency = [c / freq.normal_count for c in freq.count]
-    return result
 
 
 if __name__ == "__main__":
