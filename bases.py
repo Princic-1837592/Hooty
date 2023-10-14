@@ -33,3 +33,16 @@ BYTES_MAP = {
     "N": N,
     "-": GAP,
 }
+
+REPLACEMENTS = [
+    (A, T),
+    (G, C),
+    (A, C),
+    (G, T),
+    (A, G),
+    (C, T),
+    (C, G, T),
+    (A, G, T),
+    (A, C, T),
+    (A, C, G),
+]

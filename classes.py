@@ -1,0 +1,45 @@
+from dataclasses import dataclass
+from multiprocessing import Process
+
+from bases import REPLACEMENTS
+
+
+@dataclass
+class Sequence:
+    group: int
+    name: str
+    seq: bytes
+
+    def __hash__(self):
+        return hash((self.group, self.seq))
+
+    def __eq__(self, other):
+        return self.group == other.group and self.seq == other.seq
+
+
+@dataclass
+class Offset:
+    offset: int
+    count: int
+
+
+@dataclass
+class ProcessData:
+    process: Process
+    father: ...
+    son: ...
+    chunk: list[int]
+
+
+@dataclass
+class Frequencies:
+    count: list[int]
+    frequencies: list[list[float]]
+    normal_count: int
+    ambiguous_count: int
+
+    def __init__(self):
+        self.count = [0 for _ in range(4)]
+        self.frequencies = [[0.0, 0.0, 0.0, 0.0] for _ in range(len(REPLACEMENTS))]
+        self.normal_count = 0
+        self.ambiguous_count = 0

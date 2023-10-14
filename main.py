@@ -1,58 +1,16 @@
 import os
 import time
 from argparse import ArgumentParser
-from dataclasses import dataclass
 from math import inf
 from multiprocessing import Pipe, Process, cpu_count
 
-import bases
 import printers
-from bases import BYTES_MAP
+from bases import BYTES_MAP, N, REPLACEMENTS, T
+from classes import Frequencies, Offset, ProcessData, Sequence
 from distances import K2P_distance, K2P_distance_ambiguity
 
 
-@dataclass
-class Sequence:
-    group: int
-    name: str
-    seq: bytes
-
-    def __hash__(self):
-        return hash((self.group, self.seq))
-
-    def __eq__(self, other):
-        return self.group == other.group and self.seq == other.seq
-
-
-@dataclass
-class Offset:
-    offset: int
-    count: int
-
-
-@dataclass
-class ProcessData:
-    process: Process
-    father: ...
-    son: ...
-    chunk: list[int]
-
-
-@dataclass
-class Frequencies:
-    count: list[int]
-    frequencies: list[float]
-    normal_count: int
-    ambiguous_count: int
-
-    def __init__(self):
-        self.count = [0 for _ in range(4)]
-        self.frequencies = []
-        self.normal_count = 0
-        self.ambiguous_count = 0
-
-
-def read_species(species_file) -> tuple[list[str], list[int], list[int]] | None:
+def read_species(species_file) -> tuple[list[str], list[int], list[int]]:
     species = []
     groups = []
     offsets = []
@@ -144,15 +102,17 @@ def compute_frequencies(seqs: list[Sequence], n_groups) -> list[list[Frequencies
     result = [[Frequencies() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
     for seq in seqs:
         for i, base in enumerate(seq.seq):
-            if base <= bases.T:
+            if base <= T:
                 result[seq.group][i].count[base] += 1
                 result[seq.group][i].normal_count += 1
-            elif base < bases.N:
+            elif base < N:
                 result[seq.group][i].ambiguous_count += 1
     for group in result:
         for freq in group:
-            d = max(freq.normal_count, 1)
-            freq.frequencies = [c / d for c in freq.count]
+            for i, replace in enumerate(REPLACEMENTS):
+                rep_count = max(sum(freq.count[b] for b in replace), 1)
+                for b in replace:
+                    freq.frequencies[i][b] = freq.count[b] / rep_count
     return result
 
 
@@ -181,7 +141,8 @@ def main():
         "--processes",
         default=cpu_count(),
         metavar="processes",
-        dest="processes"
+        dest="processes",
+        type=int
     )
     parser.add_argument(
         "-a",
@@ -214,6 +175,7 @@ def main():
     distance_f = K2P_distance
     if args.ambiguous:
         frequencies = compute_frequencies(seqs, n_groups)
+        print("Computed frequencies")
         distance_f = K2P_distance_ambiguity
 
     seqs, seqs_offsets, min_dist_0 = remove_duplicates(seqs, n_groups)
@@ -278,7 +240,7 @@ def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe, dista
                 for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
                     if i == j:
                         continue
-                    distance = distance_f(seqs[i].seq, seqs[j].seq, frequencies)
+                    distance = distance_f(seqs[i], seqs[j], frequencies)
                     if distance < min_score:
                         min_score = distance
                     if distance > max_score:
