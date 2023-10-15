@@ -24,11 +24,15 @@ def to_sv(matrix, separator, species, groups):
 def format_cell(cell):
     vals = []
     for val in cell:
-        if abs(val) == 0.0:
-            val = " 0.00"
-        elif val in (nan, inf, -inf):
-            val = "??.??"
-        else:
-            val = f"{val * 100:>5.2f}"
-        vals.append(val)
+        vals.append(format_value(val))
     return " - ".join(vals)
+
+
+def format_value(val):
+    if abs(val) == 0.0:
+        val = " 0.00"
+    elif val in (nan, inf, -inf):
+        val = "  /  "
+    else:
+        val = f"{val * 100:>5.2f}"
+    return val
