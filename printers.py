@@ -1,4 +1,4 @@
-from math import nan, inf
+from math import inf, nan
 
 
 def to_csv(matrix, species, groups):
