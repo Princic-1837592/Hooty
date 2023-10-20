@@ -116,6 +116,33 @@ def compute_frequencies(seqs: list[Sequence], n_groups) -> list[list[Frequencies
     return result
 
 
+def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe, distance_f, frequencies):
+    result = [[(inf, -inf)] * (n_groups - group) for group in groups]
+    for g1_0, g1 in enumerate(groups):
+        for g2_0, g2 in enumerate(range(g1, n_groups)):
+            g1_offset = seqs_offsets[g1]
+            g2_offset = seqs_offsets[g2]
+            min_score, max_score = inf, -inf
+            for i in range(g1_offset.offset, g1_offset.offset + g1_offset.count):
+                for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
+                    if i == j:
+                        continue
+                    distance = distance_f(seqs[i], seqs[j], frequencies)
+                    if distance < min_score:
+                        min_score = distance
+                    if distance > max_score:
+                        max_score = distance
+            if g1 == g2:
+                if min_dist_0[g1]:
+                    min_score = 0.0
+                if g1_offset.count == 1:
+                    max_score = 0.0
+            result[g1_0][g2_0] = (min_score, max_score)
+    if pipe is None:
+        return result
+    pipe.send(result)
+
+
 def main():
     start = time.time()
 
@@ -227,33 +254,6 @@ def main():
 
     end = time.time()
     print(f"{end - start:.2f}")
-
-
-def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe, distance_f, frequencies):
-    result = [[(inf, -inf)] * (n_groups - group) for group in groups]
-    for g1_0, g1 in enumerate(groups):
-        for g2_0, g2 in enumerate(range(g1, n_groups)):
-            g1_offset = seqs_offsets[g1]
-            g2_offset = seqs_offsets[g2]
-            min_score, max_score = inf, -inf
-            for i in range(g1_offset.offset, g1_offset.offset + g1_offset.count):
-                for j in range(g2_offset.offset, g2_offset.offset + g2_offset.count):
-                    if i == j:
-                        continue
-                    distance = distance_f(seqs[i], seqs[j], frequencies)
-                    if distance < min_score:
-                        min_score = distance
-                    if distance > max_score:
-                        max_score = distance
-            if g1 == g2:
-                if min_dist_0[g1]:
-                    min_score = 0.0
-                if g1_offset.count == 1:
-                    max_score = 0.0
-            result[g1_0][g2_0] = (min_score, max_score)
-    if pipe is None:
-        return result
-    pipe.send(result)
 
 
 if __name__ == "__main__":
