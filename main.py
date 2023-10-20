@@ -5,8 +5,8 @@ from math import inf
 from multiprocessing import Pipe, Process, cpu_count
 
 import printers
-from bases import BYTES_MAP, N, REPLACEMENTS, T
-from classes import Group, Offset, ProcessData, Sequence
+from bases import BYTES_MAP, REPLACEMENTS, T
+from classes import AmbiguityInfo, Frequencies, Offset, ProcessData, Sequence
 from distances import K2P_distance, K2P_distance_ambiguity
 
 
@@ -98,25 +98,23 @@ def remove_duplicates(seqs, n_groups) -> tuple[list[Sequence], list[Offset], lis
     return seqs, offsets, min_dist_0
 
 
-def compute_frequencies(seqs: list[Sequence], n_groups) -> list[Group]:
-    result = [Group(len(seqs[0].seq)) for _ in range(n_groups)]
+def compute_frequencies(seqs: list[Sequence], n_groups, threshold) -> AmbiguityInfo:
+    result = [[Frequencies() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
     for seq in seqs:
         for i, base in enumerate(seq.seq):
             if base <= T:
                 result[seq.group][i].count[base] += 1
                 result[seq.group][i].normal_count += 1
-                result[seq.group].normal_count += 1
-            elif base < N:
+            else:
                 result[seq.group][i].ambiguous_count += 1
-                result[seq.group].ambiguous_count += 1
     for group in result:
         for freq in group:
             for i, replace in enumerate(REPLACEMENTS):
                 rep_count = max(sum(freq.count[b] for b in replace), 1)
                 for b in replace:
                     freq.frequencies[i][b] = freq.count[b] / rep_count
-        group.percentage = group.normal_count / (group.normal_count + group.ambiguous_count)
-    return result
+            freq.percentage = freq.ambiguous_count / max(freq.ambiguous_count + freq.normal_count, 1)
+    return AmbiguityInfo(result, threshold)
 
 
 def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe, distance_f, frequencies):
@@ -182,6 +180,14 @@ def main():
         help="count ambiguous bases",
         dest="ambiguous"
     )
+    parser.add_argument(
+        "-t",
+        "--threshold",
+        default=0.1,
+        help="max percentage of ambiguous bases in a group",
+        dest="threshold",
+        type=float
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.fasta_file):
@@ -204,7 +210,7 @@ def main():
     frequencies = None
     distance_f = K2P_distance
     if args.ambiguous:
-        frequencies = compute_frequencies(seqs, n_groups)
+        frequencies = compute_frequencies(seqs, n_groups, args.threshold)
         print("Computed frequencies")
         distance_f = K2P_distance_ambiguity
 

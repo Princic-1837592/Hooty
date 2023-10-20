@@ -1,7 +1,7 @@
 from math import log, nan, sqrt
 
 from bases import A, C, G, GAP, N, T, W
-from classes import Group, Sequence
+from classes import AmbiguityInfo, Sequence
 
 TRANSITIONS = [
     # A  C  G  T
@@ -45,7 +45,7 @@ def K2P_distance(seq1: Sequence, seq2: Sequence, _):
     return d
 
 
-def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: list[Group]):
+def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: AmbiguityInfo):
     """
     Kimura 2-Parameter distance = -0.5 log( (1 - 2p -q) * sqrt( 1 - 2q ) )
     Kimura 2-Parameter distance = -0.5 log( (1 - 2p -q) * sqrt( 1 - 2q ) )
@@ -72,15 +72,14 @@ def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: list[Gro
         if x <= T and y <= T:
             ts_count += TRANSITIONS[x][y]
             tv_count += 1 - TRANSITIONS[x][y]
-        elif g1.percentage < 0.1 and g2.percentage < 0.1:
-            x -= W
-            y -= W
-            ts_count_f += (g1[i][x][A] * g2[i][y][G] + g1[i][x][G] * g2[i][y][A] +
-                           g1[i][x][C] * g2[i][y][T] + g1[i][x][T] * g2[i][y][C])
-            tv_count_f += (g1[i][x][A] * g2[i][y][T] + g1[i][x][T] * g2[i][y][A] +
-                           g1[i][x][A] * g2[i][y][C] + g1[i][x][C] * g2[i][y][A] +
-                           g1[i][x][G] * g2[i][y][T] + g1[i][x][T] * g2[i][y][G] +
-                           g1[i][x][G] * g2[i][y][C] + g1[i][x][C] * g2[i][y][G])
+        elif g1[i].percentage < frequencies.threshold and g2[i].percentage < frequencies.threshold:
+            x = g1[i][x - W]
+            y = g2[i][y - W]
+            ts_count_f += x[A] * y[G] + x[G] * y[A] + x[C] * y[T] + x[T] * y[C]
+            tv_count_f += (x[A] * y[T] + x[T] * y[A] +
+                           x[A] * y[C] + x[C] * y[A] +
+                           x[G] * y[T] + x[T] * y[G] +
+                           x[G] * y[C] + x[C] * y[G])
         else:
             length -= 1
     p = (float(ts_count) + ts_count_f) / length
