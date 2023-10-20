@@ -1,7 +1,7 @@
 from math import log, nan, sqrt
 
 from bases import A, C, G, GAP, N, T, W
-from classes import Frequencies, Sequence
+from classes import Group, Sequence
 
 TRANSITIONS = [
     # A  C  G  T
@@ -45,7 +45,7 @@ def K2P_distance(seq1: Sequence, seq2: Sequence, _):
     return d
 
 
-def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: list[list[Frequencies]]):
+def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: list[Group]):
     """
     Kimura 2-Parameter distance = -0.5 log( (1 - 2p -q) * sqrt( 1 - 2q ) )
     Kimura 2-Parameter distance = -0.5 log( (1 - 2p -q) * sqrt( 1 - 2q ) )
@@ -65,28 +65,24 @@ def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: list[lis
     tv_count = 0
     tv_count_f = 0.0
     length = len(pairs)
-    f1 = frequencies[seq1.group]
-    f2 = frequencies[seq2.group]
+    g1 = frequencies[seq1.group]
+    g2 = frequencies[seq2.group]
 
     for i, (x, y) in filter(lambda p: p[1][0] != p[1][1], pairs):
         if x <= T and y <= T:
             ts_count += TRANSITIONS[x][y]
             tv_count += 1 - TRANSITIONS[x][y]
-        else:
+        elif g1.percentage < 0.1 and g2.percentage < 0.1:
             x -= W
             y -= W
-            ts_count_f += (f1[i].frequencies[x][A] * f2[i].frequencies[y][G] +
-                           f1[i].frequencies[x][G] * f2[i].frequencies[y][A] +
-                           f1[i].frequencies[x][C] * f2[i].frequencies[y][T] +
-                           f1[i].frequencies[x][T] * f2[i].frequencies[y][C])
-            tv_count_f += (f1[i].frequencies[x][A] * f2[i].frequencies[y][T] +
-                           f1[i].frequencies[x][T] * f2[i].frequencies[y][A] +
-                           f1[i].frequencies[x][A] * f2[i].frequencies[y][C] +
-                           f1[i].frequencies[x][C] * f2[i].frequencies[y][A] +
-                           f1[i].frequencies[x][G] * f2[i].frequencies[y][T] +
-                           f1[i].frequencies[x][T] * f2[i].frequencies[y][G] +
-                           f1[i].frequencies[x][G] * f2[i].frequencies[y][C] +
-                           f1[i].frequencies[x][C] * f2[i].frequencies[y][G])
+            ts_count_f += (g1[i][x][A] * g2[i][y][G] + g1[i][x][G] * g2[i][y][A] +
+                           g1[i][x][C] * g2[i][y][T] + g1[i][x][T] * g2[i][y][C])
+            tv_count_f += (g1[i][x][A] * g2[i][y][T] + g1[i][x][T] * g2[i][y][A] +
+                           g1[i][x][A] * g2[i][y][C] + g1[i][x][C] * g2[i][y][A] +
+                           g1[i][x][G] * g2[i][y][T] + g1[i][x][T] * g2[i][y][G] +
+                           g1[i][x][G] * g2[i][y][C] + g1[i][x][C] * g2[i][y][G])
+        else:
+            length -= 1
     p = (float(ts_count) + ts_count_f) / length
     q = (float(tv_count) + tv_count_f) / length
     try:

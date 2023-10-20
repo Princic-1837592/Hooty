@@ -6,7 +6,7 @@ from multiprocessing import Pipe, Process, cpu_count
 
 import printers
 from bases import BYTES_MAP, N, REPLACEMENTS, T
-from classes import Frequencies, Offset, ProcessData, Sequence
+from classes import Group, Offset, ProcessData, Sequence
 from distances import K2P_distance, K2P_distance_ambiguity
 
 
@@ -98,21 +98,24 @@ def remove_duplicates(seqs, n_groups) -> tuple[list[Sequence], list[Offset], lis
     return seqs, offsets, min_dist_0
 
 
-def compute_frequencies(seqs: list[Sequence], n_groups) -> list[list[Frequencies]]:
-    result = [[Frequencies() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
+def compute_frequencies(seqs: list[Sequence], n_groups) -> list[Group]:
+    result = [Group(len(seqs[0].seq)) for _ in range(n_groups)]
     for seq in seqs:
         for i, base in enumerate(seq.seq):
             if base <= T:
                 result[seq.group][i].count[base] += 1
                 result[seq.group][i].normal_count += 1
+                result[seq.group].normal_count += 1
             elif base < N:
                 result[seq.group][i].ambiguous_count += 1
+                result[seq.group].ambiguous_count += 1
     for group in result:
         for freq in group:
             for i, replace in enumerate(REPLACEMENTS):
                 rep_count = max(sum(freq.count[b] for b in replace), 1)
                 for b in replace:
                     freq.frequencies[i][b] = freq.count[b] / rep_count
+        group.percentage = group.normal_count / (group.normal_count + group.ambiguous_count)
     return result
 
 
@@ -251,6 +254,7 @@ def main():
     string = printers.to_csv(result, species, groups)
     with open(args.output_file, "w") as f:
         f.write(string)
+    print(f"Output written to {args.output_file}")
 
     end = time.time()
     print(f"{end - start:.2f}")

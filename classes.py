@@ -43,3 +43,26 @@ class Frequencies:
         self.frequencies = [[0.0, 0.0, 0.0, 0.0] for _ in range(len(REPLACEMENTS))]
         self.normal_count = 0
         self.ambiguous_count = 0
+
+    def __getitem__(self, item):
+        return self.frequencies[item]
+
+
+@dataclass
+class Group:
+    normal_count: int
+    ambiguous_count: int
+    percentage: float
+    frequencies: list[Frequencies]
+
+    def __init__(self, length: int):
+        self.normal_count = 0
+        self.ambiguous_count = 0
+        self.percentage = 0.0
+        self.frequencies = [Frequencies() for _ in range(length)]
+
+    def __getitem__(self, item):
+        return self.frequencies[item]
+
+    def __iter__(self):
+        return iter(self.frequencies)
