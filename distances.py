@@ -35,8 +35,8 @@ def K2P_distance(seq1: Sequence, seq2: Sequence, _):
         ts_count += TRANSITIONS[x][y]
         tv_count += 1 - TRANSITIONS[x][y]
 
-    p = float(ts_count) / length
-    q = float(tv_count) / length
+    p = float(ts_count) / max(length, 1)
+    q = float(tv_count) / max(length, 1)
     try:
         d = -0.5 * log((1 - 2 * p - q) * sqrt(1 - 2 * q))
     except ValueError:
@@ -82,8 +82,8 @@ def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: Ambiguit
                            x[G] * y[C] + x[C] * y[G])
         else:
             length -= 1
-    p = (float(ts_count) + ts_count_f) / length
-    q = (float(tv_count) + tv_count_f) / length
+    p = (float(ts_count) + ts_count_f) / max(length, 1)
+    q = (float(tv_count) + tv_count_f) / max(length, 1)
     try:
         d = -0.5 * log((1 - 2 * p - q) * sqrt(1 - 2 * q))
     except ValueError:
