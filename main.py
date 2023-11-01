@@ -120,8 +120,8 @@ def compute_frequencies(seqs: list[Sequence], n_groups, threshold) -> AmbiguityI
 def compute_groups(groups, n_groups, min_dist_0, seqs, seqs_offsets, pipe, distance_f, frequencies):
     result = [[(inf, -inf)] * (n_groups - group) for group in groups]
     for g1_0, g1 in enumerate(groups):
+        g1_offset = seqs_offsets[g1]
         for g2_0, g2 in enumerate(range(g1, n_groups)):
-            g1_offset = seqs_offsets[g1]
             g2_offset = seqs_offsets[g2]
             min_score, max_score = inf, -inf
             for i in range(g1_offset.offset, g1_offset.offset + g1_offset.count):
