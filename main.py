@@ -74,8 +74,6 @@ def main():
     n_groups = len(group_offsets)
     print(f"Number of species: {len(species)}")
     print(f"Number of groups: {n_groups}")
-    if args.processes > n_groups:
-        args.processes = n_groups
 
     dup_seqs = read_fasta(args.fasta_file, species, groups)
     print(f"Number of sequences with duplicates: {len(dup_seqs)}")
@@ -88,10 +86,12 @@ def main():
         distance_f = K2P_distance_ambiguity
 
     seqs, seqs_offsets, min_dist_0 = remove_duplicates(dup_seqs, n_groups)
-    print(len(seqs))
     print(f"Number of sequences without duplicates: {len(seqs)}")
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
-    if args.processes == 1:
+    processes = args.processes
+    if processes > n_groups:
+        processes = n_groups
+    if processes == 1:
         p_result = compute_groups(
             range(n_groups),
             n_groups,
@@ -107,7 +107,7 @@ def main():
                 result[g2][g1] = p_result[g1][g2_0]
     else:
         run_processes(
-            args.processes,
+            processes,
             n_groups,
             result,
             compute_groups,
@@ -120,15 +120,19 @@ def main():
     print(f"Output written to {args.output_file}")
 
     if args.full_matrix is not None:
-        full_result = [[(inf, -inf)] * (i + 1) for i in range(len(dup_seqs))]
+        n_groups = len(dup_seqs)
+        processes = args.processes
+        if processes > n_groups:
+            processes = n_groups
+        full_result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
         run_processes(
-            args.processes,
-            len(dup_seqs),
-            result,
+            processes,
+            n_groups,
+            full_result,
             compute_individual_groups,
-            (seqs, distance_f, frequencies)
+            (dup_seqs, distance_f, frequencies)
         )
-        string = printers.to_csv(full_result, [seq.name for seq in dup_seqs], [i for i in range(len(dup_seqs))])
+        string = printers.to_csv(full_result, [seq.name for seq in dup_seqs], [i for i in range(n_groups)])
         with open(args.full_matrix, "w") as f:
             f.write(string)
         print(f"Full matrix written to {args.full_matrix}")

@@ -73,7 +73,7 @@ def read_fasta(fasta_file, species, groups) -> list[Sequence]:
             # todo
             # exit(1)
         elif of_n_groups == 0:
-            print(f"Warning: match not found for sequence '{name}'")
+            # print(f"Warning: match not found for sequence '{name}'")
             pass
 
     if any(len(seq.seq) != len(seqs[0].seq) for seq in seqs):
