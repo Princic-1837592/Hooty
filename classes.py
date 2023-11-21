@@ -6,6 +6,7 @@ from bases import REPLACEMENTS
 
 @dataclass
 class Sequence:
+    index: int
     group: int
     name: str
     seq: bytes
