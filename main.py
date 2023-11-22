@@ -49,7 +49,7 @@ def main():
     parser.add_argument(
         "-t",
         "--threshold",
-        default=0.1,
+        default=0.05,
         help="max percentage of ambiguous bases in a group",
         dest="threshold",
         type=float
