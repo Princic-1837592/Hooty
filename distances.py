@@ -20,12 +20,12 @@ def K2P_distance(seq1: Sequence, seq2: Sequence, _):
     p = transition frequency
     q = transversion frequency
     """
-    pairs = []
+    pairs = [x for x in zip(seq1.seq, seq2.seq) if GAP not in x and N not in x]
 
-    # collect ungapped pairs
-    for x in zip(seq1.seq, seq2.seq):
-        if GAP not in x and N not in x:
-            pairs.append(x)
+    # # collect ungapped pairs
+    # for x in zip(seq1.seq, seq2.seq):
+    #     if GAP not in x and N not in x:
+    #         pairs.append(x)
 
     ts_count = 0
     tv_count = 0
@@ -53,12 +53,12 @@ def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: Ambiguit
     p = transition frequency
     q = transversion frequency
     """
-    pairs = []
+    pairs = [(i, x) for i, x in enumerate(zip(seq1.seq, seq2.seq)) if GAP not in x and N not in x]
 
-    # collect ungapped pairs
-    for i, x in enumerate(zip(seq1.seq, seq2.seq)):
-        if GAP not in x and N not in x:
-            pairs.append((i, x))
+    # # collect ungapped pairs
+    # for i, x in enumerate(zip(seq1.seq, seq2.seq)):
+    #     if GAP not in x and N not in x:
+    #         pairs.append((i, x))
 
     ts_count = 0
     ts_count_f = 0.0
@@ -76,10 +76,12 @@ def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: Ambiguit
             x = g1[i][x - W]
             y = g2[i][y - W]
             ts_count_f += x[A] * y[G] + x[G] * y[A] + x[C] * y[T] + x[T] * y[C]
-            tv_count_f += (x[A] * y[T] + x[T] * y[A] +
-                           x[A] * y[C] + x[C] * y[A] +
-                           x[G] * y[T] + x[T] * y[G] +
-                           x[G] * y[C] + x[C] * y[G])
+            tv_count_f += (
+                    x[A] * y[T] + x[T] * y[A] +
+                    x[A] * y[C] + x[C] * y[A] +
+                    x[G] * y[T] + x[T] * y[G] +
+                    x[G] * y[C] + x[C] * y[G]
+            )
         else:
             length -= 1
     p = (float(ts_count) + ts_count_f) / max(length, 1)
