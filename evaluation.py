@@ -13,8 +13,10 @@ from printers import format_value
 def to_columns(matrix, min_max, dataset) -> list[str]:
     min_max = 0 if min_max == "min" else 1
     lines = [dataset]
+    for i in range(len(matrix)):
+        lines.append(format_value(matrix[i][i][min_max]))
     for row in matrix:
-        for vals in row:
+        for vals in row[:-1]:
             lines.append(format_value(vals[min_max]))
     return lines
 
