@@ -2,10 +2,10 @@ import os
 import time
 from argparse import ArgumentParser
 from math import inf
-from multiprocessing import Pipe, Process, cpu_count
+from multiprocessing import cpu_count
 
-from classes import ProcessData
 from distances import K2P_distance, K2P_distance_ambiguity
+from functions import run_processes
 from main import compute_frequencies, compute_groups, read_fasta, read_species, remove_duplicates
 from printers import format_value
 
@@ -74,8 +74,6 @@ def main():
     n_groups = len(group_offsets)
     print(f"Number of species: {len(species)}")
     print(f"Number of groups: {n_groups}")
-    if args.processes > n_groups:
-        args.processes = n_groups
 
     columns_min = []
     columns_max = []
@@ -94,14 +92,17 @@ def main():
         seqs, seqs_offsets, min_dist_0 = remove_duplicates(seqs, n_groups)
         print(f"Number of sequences without duplicates: {len(seqs)}")
         result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
-        if args.processes == 1:
+        processes = args.processes
+        if processes > n_groups:
+            processes = n_groups
+        if processes == 1:
             p_result = compute_groups(
                 range(n_groups),
                 n_groups,
+                None,
                 min_dist_0,
                 seqs,
                 seqs_offsets,
-                None,
                 distance_f,
                 frequencies
             )
@@ -109,30 +110,13 @@ def main():
                 for g2_0, g2 in enumerate(range(g1, n_groups)):
                     result[g2][g1] = p_result[g1][g2_0]
         else:
-            numbers = list(range(n_groups))
-            groups_per_chunk = n_groups // args.processes
-            print(f"Working with {args.processes} processes, {groups_per_chunk} groups per process")
-            chunks = [numbers[i:i + groups_per_chunk] for i in range(0, n_groups, groups_per_chunk)]
-            if len(chunks) > args.processes:
-                chunks[-2].extend(chunks[-1])
-                chunks.pop()
-            processes = []
-            for g, chunk in enumerate(chunks):
-                father, son = Pipe(False)
-                p = Process(
-                    target=compute_groups,
-                    args=(chunk, n_groups, min_dist_0, seqs, seqs_offsets, son, distance_f, frequencies)
-                )
-                p.start()
-                processes.append(ProcessData(p, father, son, chunk))
-            for p, pdata in enumerate(processes):
-                p_result = pdata.father.recv()
-                for g1_0, g1 in enumerate(pdata.chunk):
-                    for g2_0, g2 in enumerate(range(g1, n_groups)):
-                        result[g2][g1] = p_result[g1_0][g2_0]
-                pdata.father.close()
-                pdata.son.close()
-                pdata.process.join()
+            run_processes(
+                processes,
+                n_groups,
+                result,
+                compute_groups,
+                (min_dist_0, seqs, seqs_offsets, distance_f, frequencies)
+            )
 
         columns_min.append(to_columns(result, "min", os.path.splitext(os.path.basename(file))[0]))
         columns_max.append(to_columns(result, "max", os.path.splitext(os.path.basename(file))[0]))
