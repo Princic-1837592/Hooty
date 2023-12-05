@@ -72,11 +72,11 @@ def main():
 
     species, groups, group_offsets = read_species(args.species_file)
     n_groups = len(group_offsets)
-    print(f"Number of species: {len(species)}")
+    # print(f"Number of species: {len(species)}")
     print(f"Number of groups: {n_groups}")
 
     dup_seqs = read_fasta(args.fasta_file, species, groups)
-    print(f"Number of sequences with duplicates: {len(dup_seqs)}")
+    print(f"Number of sequences (with duplicates): {len(dup_seqs)}")
 
     frequencies = None
     distance_f = K2P_distance
@@ -86,7 +86,7 @@ def main():
         distance_f = K2P_distance_ambiguity
 
     seqs, seqs_offsets, min_dist_0 = remove_duplicates(dup_seqs, n_groups)
-    print(f"Number of sequences without duplicates: {len(seqs)}")
+    print(f"Number of sequences (without duplicates): {len(seqs)}")
     result = [[(inf, -inf)] * (i + 1) for i in range(n_groups)]
     processes = args.processes
     if processes > n_groups:
