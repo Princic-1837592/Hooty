@@ -35,6 +35,9 @@ def K2P_distance(seq1: Sequence, seq2: Sequence, _):
         ts_count += TRANSITIONS[x][y]
         tv_count += 1 - TRANSITIONS[x][y]
 
+    if length == 0:
+        return nan
+
     p = float(ts_count) / max(length, 1)
     q = float(tv_count) / max(length, 1)
     try:
@@ -84,6 +87,10 @@ def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: Ambiguit
             )
         else:
             length -= 1
+
+    if length == 0:
+        return nan
+
     p = (float(ts_count) + ts_count_f) / max(length, 1)
     q = (float(tv_count) + tv_count_f) / max(length, 1)
     try:
