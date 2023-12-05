@@ -6,7 +6,7 @@ from multiprocessing import cpu_count
 
 from distances import K2P_distance, K2P_distance_ambiguity
 from functions import run_processes
-from main import compute_frequencies, compute_groups, read_fasta, read_species, remove_duplicates
+from hooty import compute_frequencies, compute_groups, read_fasta, read_species, remove_duplicates
 from printers import format_value
 
 
