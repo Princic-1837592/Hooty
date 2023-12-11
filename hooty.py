@@ -1,8 +1,9 @@
 import os
 import time
-from argparse import ArgumentParser
 from math import inf
 from multiprocessing import cpu_count
+
+from gooey import GooeyParser, Gooey
 
 import printers
 from distances import K2P_distance, K2P_distance_ambiguity
@@ -10,65 +11,83 @@ from functions import read_species, read_fasta, compute_frequencies, remove_dupl
     compute_individual_groups
 
 
+@Gooey(
+    program_name="Hooty",
+    program_description="Compute distances between groups of sequences",
+    use_cmd_args=True,
+)
 def main():
     start = time.time()
 
-    parser = ArgumentParser()
-    parser.add_argument("fasta_file")
-    parser.add_argument("species_file")
+    parser = GooeyParser()
+    parser.add_argument(
+        "fasta_file",
+        metavar="Fasta file",
+        help="path to the fasta file",
+        widget="FileChooser",
+    )
+    parser.add_argument(
+        "species_file",
+        metavar="Species file",
+        help="path to the species file",
+        widget="FileChooser",
+    )
     parser.add_argument(
         "-o",
         "--output",
-        default="output.txt",
-        metavar="output-file",
-        dest="output_file"
+        metavar="Output file",
+        default=None,
+        dest="output_file",
     )
     parser.add_argument(
         "-l",
         "--log",
-        default="log.txt",
-        metavar="log-file",
-        dest="log_file"
+        metavar="Log file",
+        default=None,
+        dest="log_file",
     )
     parser.add_argument(
         "-p",
         "--processes",
+        metavar="Processes",
         default=cpu_count(),
-        metavar="processes",
         dest="processes",
-        type=int
+        type=int,
+        widget="IntegerField",
     )
     parser.add_argument(
-        "-a",
-        "--ambiguous",
+        "-u",
+        "--unambiguous",
+        metavar="Unambiguous",
         default=False,
         action="store_true",
-        help="count ambiguous bases",
-        dest="ambiguous"
+        help="ignore ambiguous bases",
+        dest="unambiguous",
     )
     parser.add_argument(
         "-t",
         "--threshold",
+        metavar="Threshold",
         default=0.05,
         help="max percentage of ambiguous bases in a group",
         dest="threshold",
-        type=float
+        type=float,
     )
     parser.add_argument(
         "--full-matrix",
-        help="compute distances for all sequences",
+        metavar="Full matrix",
         default=None,
-        metavar="full-matrix",
-        dest="full_matrix"
+        help="compute distances for all sequences",
+        dest="full_matrix",
     )
     args = parser.parse_args()
 
     if not os.path.exists(args.fasta_file):
         print("Error: fasta file does not exist")
-        return
+        return 1
     if not os.path.exists(args.species_file):
         print("Error: species file does not exist")
-        return
+        return 2
 
     species, groups, group_offsets = read_species(args.species_file)
     n_groups = len(group_offsets)
@@ -80,7 +99,7 @@ def main():
 
     frequencies = None
     distance_f = K2P_distance
-    if args.ambiguous:
+    if not args.unambiguous:
         frequencies = compute_frequencies(dup_seqs, n_groups, args.threshold)
         print("Computed frequencies")
         distance_f = K2P_distance_ambiguity
@@ -139,7 +158,10 @@ def main():
 
     end = time.time()
     print(f"{end - start:.2f}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    error_code = main()
+    if error_code != 0:
+        exit(error_code)
