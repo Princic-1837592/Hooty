@@ -51,7 +51,6 @@ def K2P_distance(seq1: Sequence, seq2: Sequence, _):
 def K2P_distance_ambiguity(seq1: Sequence, seq2: Sequence, frequencies: AmbiguityInfo):
     """
     Kimura 2-Parameter distance = -0.5 log( (1 - 2p -q) * sqrt( 1 - 2q ) )
-    Kimura 2-Parameter distance = -0.5 log( (1 - 2p -q) * sqrt( 1 - 2q ) )
     where:
     p = transition frequency
     q = transversion frequency
