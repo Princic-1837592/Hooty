@@ -1,15 +1,15 @@
 from math import inf, nan
 
+SEPARATORS = {
+    "comma": ",",
+    "semicolon": ";",
+    "tab": "\t",
+}
+DEFAULT_SEPARATOR = "semicolon"
 
-def to_csv(matrix, species, groups):
-    return to_sv(matrix, ",", species, groups)
 
-
-def to_tsv(matrix, species, groups):
-    return to_sv(matrix, "\t", species, groups)
-
-
-def to_sv(matrix, separator, species, groups):
+def to_sv(matrix, species, groups, separator):
+    separator = SEPARATORS.get(separator, SEPARATORS[DEFAULT_SEPARATOR])
     header_groups = [[] for _ in range(groups[-1] + 2)]
     for specie, group in zip(species, groups):
         header_groups[group + 1].append(specie)

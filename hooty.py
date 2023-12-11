@@ -80,6 +80,15 @@ def main():
         help="compute distances for all sequences",
         dest="full_matrix",
     )
+    parser.add_argument(
+        "-s",
+        "--sep",
+        metavar="Separator",
+        choices=list(printers.SEPARATORS.keys()),
+        default=printers.DEFAULT_SEPARATOR,
+        help="separator for the output file",
+        dest="separator",
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.fasta_file):
@@ -133,7 +142,7 @@ def main():
             (min_dist_0, seqs, seqs_offsets, distance_f, frequencies)
         )
 
-    string = printers.to_csv(result, species, groups)
+    string = printers.to_sv(result, species, groups, args.separator)
     if args.output_file is None:
         args.output_file = os.path.splitext(args.fasta_file)[0] + ".csv"
     with open(args.output_file, "w") as f:
@@ -153,7 +162,12 @@ def main():
             compute_individual_groups,
             (dup_seqs, distance_f, frequencies)
         )
-        string = printers.to_csv(full_result, [seq.name for seq in dup_seqs], [i for i in range(n_groups)])
+        string = printers.to_sv(
+            full_result,
+            [seq.name for seq in dup_seqs],
+            [i for i in range(n_groups)],
+            args.separator
+        )
         with open(args.full_matrix, "w") as f:
             f.write(string)
         print(f"Full matrix written to {args.full_matrix}")
