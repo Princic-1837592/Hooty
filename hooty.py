@@ -134,6 +134,8 @@ def main():
         )
 
     string = printers.to_csv(result, species, groups)
+    if args.output_file is None:
+        args.output_file = os.path.splitext(args.fasta_file)[0] + ".csv"
     with open(args.output_file, "w") as f:
         f.write(string)
     print(f"Output written to {args.output_file}")
