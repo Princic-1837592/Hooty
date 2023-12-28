@@ -1,21 +1,24 @@
-from argparse import ArgumentParser
 from multiprocessing import cpu_count
+
+from gooey import GooeyParser, Gooey
 
 import printers
 from main import main as internal_main
 
 
 def main() -> int:
-    parser = ArgumentParser()
+    parser = GooeyParser()
     parser.add_argument(
         "fasta_file",
         metavar="Fasta file",
         help="path to the fasta file",
+        widget="FileChooser",
     )
     parser.add_argument(
         "species_file",
         metavar="Species file",
         help="path to the species file",
+        widget="FileChooser",
     )
     parser.add_argument(
         "-o",
@@ -38,10 +41,12 @@ def main() -> int:
         default=cpu_count(),
         dest="processes",
         type=int,
+        widget="IntegerField",
     )
     parser.add_argument(
         "-u",
         "--unambiguous",
+        metavar="Unambiguous",
         default=False,
         action="store_true",
         help="ignore ambiguous bases",
@@ -72,7 +77,11 @@ def main() -> int:
         help="separator for the output file",
         dest="separator",
     )
-    return internal_main(parser)
+    return Gooey(
+        program_name="Hooty",
+        program_description="Compute distances between groups of sequences",
+        use_cmd_args=True,
+    )(internal_main)(parser)
 
 
 if __name__ == "__main__":
