@@ -120,5 +120,5 @@ def main(parser) -> int:
         print(f"Full matrix written to {args.full_matrix}")
 
     end = time.time()
-    print(f"{end - start:.2f}")
+    print(f"Completion time: {end - start:.2f} seconds")
     return 0
