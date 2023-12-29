@@ -27,10 +27,12 @@ body {
 
 
 #doc {
+    max-width: 1300px;
     border: 1px solid gray;
     font-family: Arial, serif;
     padding: 50px;
     border-radius: 10px;
+    margin: 0 auto;
 
     div.section {
         margin-top: 30px;
