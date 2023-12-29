@@ -75,6 +75,7 @@ def main() -> int:
         type=float,
     )
     parser.add_argument(
+        "-f",
         "--full-matrix",
         metavar="Full matrix",
         default=None,
