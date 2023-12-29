@@ -65,7 +65,7 @@ def to_bytes(sequence: str) -> bytes:
     return bytes(map(lambda c: BYTES_MAP[c], sequence))
 
 
-def read_fasta(fasta_file, species, groups) -> list[Sequence]:
+def read_fasta(fasta_file: str, species, groups) -> list[Sequence]:
     with open(fasta_file, "r") as f:
         lines = f.read().strip().splitlines()
     # if len(lines) % 2 != 0:
@@ -120,7 +120,7 @@ def remove_duplicates(seqs: list[Sequence], n_groups: int) -> tuple[list[Sequenc
     return seqs, offsets, min_dist_0
 
 
-def compute_frequencies(seqs: list[Sequence], n_groups, threshold) -> AmbiguityInfo:
+def compute_frequencies(seqs: list[Sequence], n_groups: int, threshold: float) -> AmbiguityInfo:
     result = [[Frequencies() for _ in range(len(seqs[0].seq))] for _ in range(n_groups)]
     for seq in seqs:
         for i, base in enumerate(seq.seq):

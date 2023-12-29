@@ -33,7 +33,7 @@ Copyright (C) 2024  Andrea Princic & Giacomo Chiappa
 
 def main(parser) -> int:
     print(COPYRIGHT)
-    
+
     args = parser.parse_args()
     start = time.time()
 
