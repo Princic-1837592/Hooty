@@ -71,7 +71,7 @@ def read_fasta(fasta_file: str, species, groups) -> list[Sequence]:
     # if len(lines) % 2 != 0:
     #     print("Error: fasta file is not in correct format")
     #     return None
-    if lines[2][1] != ">":
+    if len(lines) > 2 and lines[2][0] != ">":
         lines = convert_to_single_lines(lines)
 
     seqs = list()
