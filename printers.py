@@ -26,7 +26,7 @@ SEPARATORS = {
 DEFAULT_SEPARATOR = "semicolon"
 
 
-def to_sv(matrix, species, groups, separator):
+def to_sv(matrix, species, groups, separator, precision):
     separator = SEPARATORS.get(separator, SEPARATORS[DEFAULT_SEPARATOR])
     header_groups = [[] for _ in range(groups[-1] + 2)]
     for specie, group in zip(species, groups):
@@ -34,23 +34,23 @@ def to_sv(matrix, species, groups, separator):
     header = list(map(lambda g: "-".join(g), header_groups))
     lines = [separator.join(header)]
     for row, group in zip(matrix, header[1:]):
-        numbers = separator.join(map(format_cell, row))
+        numbers = separator.join(map(lambda c: format_cell(c, precision), row))
         lines.append(f"{group}{separator}{numbers}")
     return "\n".join(lines)
 
 
-def format_cell(cell):
+def format_cell(cell, precision):
     vals = []
     for val in cell if type(cell) == tuple else (cell,):
-        vals.append(format_value(val))
+        vals.append(format_value(val, precision))
     return " – ".join(vals)
 
 
-def format_value(val):
+def format_value(val, precision):
     if abs(val) == 0.0:
-        val = " 0.00"
+        val = f"0"
     elif val in (nan, inf, -inf):
-        val = "  /  "
+        val = "/"
     else:
-        val = f"{val * 100:>5.2f}"
+        val = f"{val * 100:.{precision}f}"
     return val

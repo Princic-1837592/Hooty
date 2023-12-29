@@ -81,10 +81,10 @@ def main(parser) -> int:
             (min_dist_0, seqs, seqs_offsets, distance_f, frequencies)
         )
 
-    string = printers.to_sv(result, species, groups, args.separator)
+    string = printers.to_sv(result, species, groups, args.separator, 2)
     if args.output_file is None:
         args.output_file = os.path.splitext(args.fasta_file)[0] + ".csv"
-    with open(args.output_file, "w") as f:
+    with open(args.output_file, "w", encoding="utf-8") as f:
         f.write(string)
     print(f"Output written to {args.output_file}")
 
@@ -105,9 +105,10 @@ def main(parser) -> int:
             full_result,
             [seq.name for seq in dup_seqs],
             [i for i in range(n_groups)],
-            args.separator
+            args.separator,
+            15
         )
-        with open(args.full_matrix, "w") as f:
+        with open(args.full_matrix, "w", encoding="utf-8") as f:
             f.write(string)
         print(f"Full matrix written to {args.full_matrix}")
 
