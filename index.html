@@ -134,23 +134,23 @@
     </div>
     <div class="section">
         <h2>SYNOPSIS</h2>
-        <p class="code wide">
-            <code>python3 hooty.py &lt;fasta_file&gt; &lt;species_file&gt; [OPTIONS]</code>
-        </p>
+        <code class="wide">
+            python3 hooty.py &lt;fasta_file&gt; &lt;species_file&gt; [OPTIONS]
+        </code>
         To use via graphical interface:
-        <p class="code wide">
-            <code>python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;species_file&gt;] [OPTIONS]</code>
-        </p>
+        <code class="wide">
+            python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;species_file&gt;] [OPTIONS]
+        </code>
     </div>
     <div class="section">
         <h2>INPUT FILES</h2>
         <p>
-            <code class="code inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
+            <code class="inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
             Sequences must have the same length.
             Sequence name must refer to a species in the species file.
         </p>
         <p>
-            <code class="code inline">&lt;species file&gt;</code> a line separated file containing one group per line.
+            <code class="inline">&lt;species file&gt;</code> a line separated file containing one group per line.
             Each group must be unique and non overlap with other groups.
             Multiple names for the same group must be on the same line, separated by commas.
         </p>
@@ -159,23 +159,23 @@
         <h2>OPTIONS</h2>
         <ul class="large">
             <li>
-                <code class="code inline title">-f | --full-matrix &lt;string&gt;</code>
+                <code class="inline title">-f | --full-matrix &lt;string&gt;</code>
                 write file with pairwise distance for all sequences
             </li>
             <li>
-                <code class="code inline title">-h | --help</code>
+                <code class="inline title">-h | --help</code>
                 print list of commands and usage
             </li>
             <li>
-                <code class="code inline title">-o | --output &lt;string&gt;</code>
+                <code class="inline title">-o | --output &lt;string&gt;</code>
                 specify name for output file
             </li>
             <li>
-                <code class="code inline title">-p | --processes &lt;integer&gt;</code>
+                <code class="inline title">-p | --processes &lt;integer&gt;</code>
                 number of processes to run in parallel. Default is number of cores on the machine
             </li>
             <li>
-                <code class="code inline title">-s | --separator &lt;x&gt;</code>
+                <code class="inline title">-s | --separator &lt;x&gt;</code>
                 separator to use in output file.
                 <code class="code inline">x</code> can be
                 <code class="code inline">tab</code>,
@@ -183,12 +183,12 @@
                 <code class="code inline">semicolon</code> (default)
             </li>
             <li>
-                <code class="code inline title">-t | --threshold &lt;number&gt;</code>
+                <code class="inline title">-t | --threshold &lt;number&gt;</code>
                 maximum percentage of ambiguous bases allowed within a group.
                 The value must be between 0 and 1. Default is 0.0
             </li>
             <li>
-                <code class="code inline title">-u | --unambiguous</code>
+                <code class="inline title">-u | --unambiguous</code>
                 always treat ambiguous sites as similarities. When this is active, the threshold parameter is ignored
             </li>
         </ul>
@@ -199,10 +199,9 @@
             Hooty was developed and tested with
             <a href="https://www.python.org/downloads/release/python-3100/">Python version 3.10</a>.
             Compatibility with previous versions has not been tested.
-            <br>
-            <br>
+        </p>
+        <p>
             To use the graphical interface, the package Gooey is required. To install it, run the following command:
-        <p class="code wide">
             <code class="wide">
                 pip install -r requirements_gui.txt
             </code>

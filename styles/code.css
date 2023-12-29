@@ -1,16 +1,21 @@
-.code {
+code {
     background-color: #32353c;
     border-radius: 7px;
 }
 
-.code.inline {
+code.inline {
     padding: 5px;
 }
 
-.code.title {
+code.title {
     margin-right: 10px;
 }
 
-.code.wide {
+code.wide {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
     padding: 20px;
 }
