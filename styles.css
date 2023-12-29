@@ -14,5 +14,53 @@ body {
 
 #info {
     font-size: 20px;
-    margin-left: 50px;
+    margin: 0 auto 40px auto;
+
+    p {
+        width: max-content;
+        margin: 40px auto 0 auto;
+    }
+
+}
+
+#doc {
+    border: 1px solid gray;
+    font-family: Arial, serif;
+    padding: 60px;
+}
+
+.separator {
+    border-bottom: 1px solid gray;
+    width: 100%;
+    margin-left: 0;
+}
+
+.code {
+    background-color: #32353c;
+    border-radius: 7px;
+}
+
+.code.inline {
+    padding: 5px;
+}
+
+.code.title {
+    margin-right: 10px;
+}
+
+.code.wide {
+    padding: 20px;
+}
+
+ul.large li {
+    margin-bottom: 10px;
+}
+
+a {
+    text-decoration: none;
+    color: #bd752b;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }

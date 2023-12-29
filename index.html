@@ -124,6 +124,68 @@
         by Andrea Princic and Giacomo Chiappa
     </p>
 </div>
-<h1 style="color: red; width:50%; margin: 50px auto;font-size: 50px">COMING SOON</h1>
+<div id="doc">
+    <h1>Hooty: a fast DNA distance matrix tool with innovative handling of ambiguous sites</h1>
+    <div class="separator"></div>
+
+    <h2>SYNOPSIS</h2>
+    <div class="separator"></div>
+    <p class="code wide">
+        <code>python3 hooty.py &lt;fasta_file&gt; &lt;species_file&gt; [OPTIONS]</code>
+    </p>
+    To use via graphical interface:
+    <p class="code wide">
+        <code>python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;species_file&gt;] [OPTIONS]</code>
+    </p>
+
+    <h2>INPUT FILES</h2>
+    <div class="separator"></div>
+    <p>
+        <code class="code inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
+        Sequences must have the same length.
+        Sequence name must refer to a species in the species file.
+    </p>
+    <p>
+        <code class="code inline">&lt;species file&gt;</code> a line separated file containing one group of species per
+        line.
+        Each group must be unique and non overlap with other groups.
+        Multiple names for the same group must be on the same line, separated by commas.
+    </p>
+
+    <h2>OPTIONS</h2>
+    <div class="separator"></div>
+    <ul class="large">
+        <li>
+            <code class="code inline title">--full-matrix &lt;string&gt;</code> write file with pairwise distance for all
+            sequences
+        </li>
+        <li>
+            <code class="code inline title">-h | --help</code> print list of commands and usage
+        </li>
+        <li>
+            <code class="code inline title">-o | --output &lt;string&gt;</code> specify name for output file
+        </li>
+        <li>
+            <code class="code inline title">-p | --processes &lt;integer&gt;</code> number of processes to run in parallel.
+            Default is number of cores on the machine
+        </li>
+        <li>
+            <code class="code inline title">-s | --separator &lt;x&gt;</code> separator to use in output file.
+            <code class="code inline">x</code> can be <code class="code inline">tab</code>, <code class="code inline">comma</code>, or <code class="code inline">semicolon</code> (default)
+        </li>
+        <li>
+            <code class="code inline title">-t | --threshold &lt;number&gt;</code> see section <a
+                href="#threshold">THRESHOLD</a>
+        </li>
+        <li>
+            <code class="code inline  title">-u | --unambiguous</code> always treat ambiguous sites as similarities.
+            This ignores the threshold parameter
+        </li>
+    </ul>
+
+    <h2 id="threshold">THRESHOLD</h2>
+    <div class="separator"></div>
+
+</div>
 </body>
 </html>
