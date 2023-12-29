@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Hooty</title>
-    <link href="styles.css" rel="stylesheet">
-    <link href="hooty.css" rel="stylesheet">
-    <link href="animations.css" rel="stylesheet">
+    <link href="styles/styles.css" rel="stylesheet">
+    <link href="styles/hooty.css" rel="stylesheet">
+    <link href="styles/animations.css" rel="stylesheet">
 </head>
 <body>
-<div id="hooty-container" class="scroller-container">
+<!--<div id="hooty-container" class="scroller-container">
     <div id="hooty" class="no-select scroller">
         <p class="hooty-column" style="animation-delay: 0.95s"><br><br>#<br>#</p>
         <p class="hooty-column" style="animation-delay: 0.94s"><br>#<br>#<br>#<br>#</p>
@@ -107,7 +107,7 @@
         <p class="hooty-column" style="animation-delay: 0.03s"><br><br>#<br>#</p>
         <p class="hooty-column" style="animation-delay: 0.01s" id="hoot-hoot">Hoot hoot!</p>
     </div>
-</div>
+</div>-->
 <div id="info">
     <p id="title" class="monospace no-select">
         ##&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;#####&nbsp;&nbsp;&nbsp;&nbsp;#####&nbsp;&nbsp;######&nbsp;##&nbsp;&nbsp;&nbsp;&nbsp;##<br>
@@ -123,96 +123,108 @@
     </p>
 </div>
 <div id="doc">
-    <h1 class="title">Hooty: a fast DNA distance matrix tool with innovative handling of ambiguous sites</h1>
-    <div class="separator"></div>
-    <p>Hooty computes the minimum and maximum K2P distance between predetermined groups in an alignment and outputs
-        results in a matrix format.
-        It also includes an option for the interpretation of ambiguous bases.</p>
+    <div class="section">
+        <h1>Hooty: a fast DNA distance matrix tool with innovative handling of ambiguous sites</h1>
+        <p>
+            Hooty computes the minimum and maximum K2P distance between predetermined groups in an alignment and outputs
+            results in a matrix format.
+            It also includes an option for the interpretation of ambiguous bases.
+        </p>
+    </div>
 
-    <h2 class="title">SYNOPSIS</h2>
-    <div class="separator"></div>
-    <p class="code wide">
-        <code>python3 hooty.py &lt;fasta_file&gt; &lt;species_file&gt; [OPTIONS]</code>
-    </p>
-    To use via graphical interface:
-    <p class="code wide">
-        <code>python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;species_file&gt;] [OPTIONS]</code>
-    </p>
+    <div class="section">
+        <h2>SYNOPSIS</h2>
+        <p class="code wide">
+            <code>python3 hooty.py &lt;fasta_file&gt; &lt;species_file&gt; [OPTIONS]</code>
+        </p>
+        To use via graphical interface:
+        <p class="code wide">
+            <code>python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;species_file&gt;] [OPTIONS]</code>
+        </p>
+    </div>
 
-    <h2 class="title">INPUT FILES</h2>
-    <div class="separator"></div>
-    <p>
-        <code class="code inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
-        Sequences must have the same length.
-        Sequence name must refer to a species in the species file.
-    </p>
-    <p>
-        <code class="code inline">&lt;species file&gt;</code> a line separated file containing one group per line.
-        Each group must be unique and non overlap with other groups.
-        Multiple names for the same group must be on the same line, separated by commas.
-    </p>
+    <div class="section">
+        <h2 class="title">INPUT FILES</h2>
+        <p>
+            <code class="code inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
+            Sequences must have the same length.
+            Sequence name must refer to a species in the species file.
+        </p>
+        <p>
+            <code class="code inline">&lt;species file&gt;</code> a line separated file containing one group per line.
+            Each group must be unique and non overlap with other groups.
+            Multiple names for the same group must be on the same line, separated by commas.
+        </p>
+    </div>
 
-    <h2 class="title">OPTIONS</h2>
-    <div class="separator"></div>
-    <ul class="large">
-        <li>
-            <code class="code inline title">--full-matrix &lt;string&gt;</code> write file with pairwise distance for
-            all
-            sequences
-        </li>
-        <li>
-            <code class="code inline title">-h | --help</code> print list of commands and usage
-        </li>
-        <li>
-            <code class="code inline title">-o | --output &lt;string&gt;</code> specify name for output file
-        </li>
-        <li>
-            <code class="code inline title">-p | --processes &lt;integer&gt;</code> number of processes to run in
-            parallel.
-            Default is number of cores on the machine
-        </li>
-        <li>
-            <code class="code inline title">-s | --separator &lt;x&gt;</code> separator to use in output file.
-            <code class="code inline">x</code> can be <code class="code inline">tab</code>, <code class="code inline">comma</code>,
-            or <code class="code inline">semicolon</code> (default)
-        </li>
-        <li>
-            <code class="code inline title">-t | --threshold &lt;number&gt;</code> maximum percentage of ambiguous bases
-            allowed within a group. The value must be between 0 and 1. Default is 0.0
-        </li>
-        <li>
-            <code class="code inline  title">-u | --unambiguous</code> always treat ambiguous sites as similarities.
-            When this is active, the threshold parameter is ignored
-        </li>
-    </ul>
+    <div class="section">
+        <h2 class="title">OPTIONS</h2>
+        <ul class="large">
+            <li>
+                <code class="code inline title">--full-matrix &lt;string&gt;</code> write file with pairwise distance
+                for
+                all
+                sequences
+            </li>
+            <li>
+                <code class="code inline title">-h | --help</code> print list of commands and usage
+            </li>
+            <li>
+                <code class="code inline title">-o | --output &lt;string&gt;</code> specify name for output file
+            </li>
+            <li>
+                <code class="code inline title">-p | --processes &lt;integer&gt;</code> number of processes to run in
+                parallel.
+                Default is number of cores on the machine
+            </li>
+            <li>
+                <code class="code inline title">-s | --separator &lt;x&gt;</code> separator to use in output file.
+                <code class="code inline">x</code> can be <code class="code inline">tab</code>, <code
+                    class="code inline">comma</code>,
+                or <code class="code inline">semicolon</code> (default)
+            </li>
+            <li>
+                <code class="code inline title">-t | --threshold &lt;number&gt;</code> maximum percentage of ambiguous
+                bases
+                allowed within a group. The value must be between 0 and 1. Default is 0.0
+            </li>
+            <li>
+                <code class="code inline  title">-u | --unambiguous</code> always treat ambiguous sites as similarities.
+                When this is active, the threshold parameter is ignored
+            </li>
+        </ul>
+    </div>
 
-    <h2 class="title">SYSTEM REQUIREMENTS</h2>
-    <div class="separator"></div>
-    <p>
-        Hooty was developed and tested with <a href="https://www.python.org/downloads/release/python-3100/">Python
-        version 3.10</a>.
-        Compatibility with previous versions has not been tested.
-        <br>
-        <br>
-        To use the graphical interface, the package Gooey is required. To install it, run the following command:
-    <p class="code wide">
-        <code class="wide">
-            pip install -r requirements_gui.txt
-        </code>
-    </p>
+    <div class="section">
+        <h2 class="title">SYSTEM REQUIREMENTS</h2>
+        <p>
+            Hooty was developed and tested with <a href="https://www.python.org/downloads/release/python-3100/">Python
+            version 3.10</a>.
+            Compatibility with previous versions has not been tested.
+            <br>
+            <br>
+            To use the graphical interface, the package Gooey is required. To install it, run the following command:
+        <p class="code wide">
+            <code class="wide">
+                pip install -r requirements_gui.txt
+            </code>
+        </p>
+    </div>
 
-    <h2 class="title">CONTIBUTION AND BUG REPORT</h2>
-    <div class="separator"></div>
-    <p>
-        If you want to contribute to the project or report a bug, you can open a pull request or an issue on the
-        <a href="https://github.com/Princic-1837592/Hooty">GitHub repository</a>
-    </p>
+    <div class="section">
+        <h2 class="title">CONTIBUTION AND BUG REPORT</h2>
+        <p>
+            If you want to contribute to the project or report a bug, you can open a pull request or an issue on the
+            <a href="https://github.com/Princic-1837592/Hooty">GitHub repository</a>
+        </p>
+    </div>
 
-    <h2 class="title">AUTHORS</h2>
-    <div class="separator"></div>
-    <p>
-        Written and developed by Andrea Princic and Giacomo Chiappa, Sapienza University of Rome, Italy.
-    </p>
+    <div class="section">
+        <h2 class="title">AUTHORS</h2>
+        <p>
+            Written and developed by Andrea Princic and Giacomo Chiappa, Sapienza University of Rome, Italy.
+        </p>
+    </div>
 
 </div>
 </body>
