@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Hooty</title>
-    <link href="styles/styles.css" rel="stylesheet">
-    <link href="styles/hooty.css" rel="stylesheet">
     <link href="styles/animations.css" rel="stylesheet">
+    <link href="styles/code.css" rel="stylesheet">
+    <link href="styles/hooty.css" rel="stylesheet">
+    <link href="styles/styles.css" rel="stylesheet">
 </head>
 <body>
 <!--<div id="hooty-container" class="scroller-container">
@@ -109,7 +110,7 @@
     </div>
 </div>-->
 <div id="info">
-    <p id="title" class="monospace no-select">
+    <p id="title" class="no-select">
         ##&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;#####&nbsp;&nbsp;&nbsp;&nbsp;#####&nbsp;&nbsp;######&nbsp;##&nbsp;&nbsp;&nbsp;&nbsp;##<br>
         ##&nbsp;&nbsp;##&nbsp;&nbsp;###&nbsp;###&nbsp;&nbsp;###&nbsp;###&nbsp;&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;&nbsp;##&nbsp;&nbsp;##<br>
         ######&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;##&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;####<br>
@@ -118,7 +119,7 @@
         ##&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;#####&nbsp;&nbsp;&nbsp;&nbsp;#####&nbsp;&nbsp;&nbsp;&nbsp;##&nbsp;&nbsp;&nbsp;&nbsp;##<br>
     </p>
 
-    <p id="names" class="monospace">
+    <p id="names">
         by Andrea Princic and Giacomo Chiappa
     </p>
 </div>
@@ -131,7 +132,6 @@
             It also includes an option for the interpretation of ambiguous bases.
         </p>
     </div>
-
     <div class="section">
         <h2>SYNOPSIS</h2>
         <p class="code wide">
@@ -142,9 +142,8 @@
             <code>python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;species_file&gt;] [OPTIONS]</code>
         </p>
     </div>
-
     <div class="section">
-        <h2 class="title">INPUT FILES</h2>
+        <h2>INPUT FILES</h2>
         <p>
             <code class="code inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
             Sequences must have the same length.
@@ -156,50 +155,49 @@
             Multiple names for the same group must be on the same line, separated by commas.
         </p>
     </div>
-
     <div class="section">
-        <h2 class="title">OPTIONS</h2>
+        <h2>OPTIONS</h2>
         <ul class="large">
             <li>
-                <code class="code inline title">--full-matrix &lt;string&gt;</code> write file with pairwise distance
-                for
-                all
-                sequences
+                <code class="code inline title">-f | --full-matrix &lt;string&gt;</code>
+                write file with pairwise distance for all sequences
             </li>
             <li>
-                <code class="code inline title">-h | --help</code> print list of commands and usage
+                <code class="code inline title">-h | --help</code>
+                print list of commands and usage
             </li>
             <li>
-                <code class="code inline title">-o | --output &lt;string&gt;</code> specify name for output file
+                <code class="code inline title">-o | --output &lt;string&gt;</code>
+                specify name for output file
             </li>
             <li>
-                <code class="code inline title">-p | --processes &lt;integer&gt;</code> number of processes to run in
-                parallel.
-                Default is number of cores on the machine
+                <code class="code inline title">-p | --processes &lt;integer&gt;</code>
+                number of processes to run in parallel. Default is number of cores on the machine
             </li>
             <li>
-                <code class="code inline title">-s | --separator &lt;x&gt;</code> separator to use in output file.
-                <code class="code inline">x</code> can be <code class="code inline">tab</code>, <code
-                    class="code inline">comma</code>,
-                or <code class="code inline">semicolon</code> (default)
+                <code class="code inline title">-s | --separator &lt;x&gt;</code>
+                separator to use in output file.
+                <code class="code inline">x</code> can be
+                <code class="code inline">tab</code>,
+                <code class="code inline">comma</code>, or
+                <code class="code inline">semicolon</code> (default)
             </li>
             <li>
-                <code class="code inline title">-t | --threshold &lt;number&gt;</code> maximum percentage of ambiguous
-                bases
-                allowed within a group. The value must be between 0 and 1. Default is 0.0
+                <code class="code inline title">-t | --threshold &lt;number&gt;</code>
+                maximum percentage of ambiguous bases allowed within a group.
+                The value must be between 0 and 1. Default is 0.0
             </li>
             <li>
-                <code class="code inline  title">-u | --unambiguous</code> always treat ambiguous sites as similarities.
-                When this is active, the threshold parameter is ignored
+                <code class="code inline title">-u | --unambiguous</code>
+                always treat ambiguous sites as similarities. When this is active, the threshold parameter is ignored
             </li>
         </ul>
     </div>
-
     <div class="section">
-        <h2 class="title">SYSTEM REQUIREMENTS</h2>
+        <h2>SYSTEM REQUIREMENTS</h2>
         <p>
-            Hooty was developed and tested with <a href="https://www.python.org/downloads/release/python-3100/">Python
-            version 3.10</a>.
+            Hooty was developed and tested with
+            <a href="https://www.python.org/downloads/release/python-3100/">Python version 3.10</a>.
             Compatibility with previous versions has not been tested.
             <br>
             <br>
@@ -210,19 +208,19 @@
             </code>
         </p>
     </div>
-
     <div class="section">
-        <h2 class="title">CONTIBUTION AND BUG REPORT</h2>
+        <h2>CONTIBUTION AND BUG REPORT</h2>
         <p>
             If you want to contribute to the project or report a bug, you can open a pull request or an issue on the
             <a href="https://github.com/Princic-1837592/Hooty">GitHub repository</a>
         </p>
     </div>
-
     <div class="section">
-        <h2 class="title">AUTHORS</h2>
+        <h2>AUTHORS</h2>
         <p>
-            Written and developed by Andrea Princic and Giacomo Chiappa, Sapienza University of Rome, Italy.
+            Written and developed by
+            <a href="https://princic-1837592.github.io/">Andrea Princic</a>
+            and Giacomo Chiappa, Sapienza University of Rome, Italy.
         </p>
     </div>
 
