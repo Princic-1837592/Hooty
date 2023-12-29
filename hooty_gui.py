@@ -74,7 +74,7 @@ def main() -> int:
         "-t",
         "--threshold",
         metavar="Threshold",
-        default=0.05,
+        default=0.0,
         help="max percentage of ambiguous bases in a group",
         dest="threshold",
         type=float,
