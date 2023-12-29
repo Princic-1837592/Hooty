@@ -43,13 +43,6 @@ def main() -> int:
         dest="output_file",
     )
     parser.add_argument(
-        "-l",
-        "--log",
-        metavar="Log file",
-        default=None,
-        dest="log_file",
-    )
-    parser.add_argument(
         "-p",
         "--processes",
         metavar="Processes",
