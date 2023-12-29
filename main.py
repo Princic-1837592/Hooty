@@ -25,8 +25,15 @@ from distances import K2P_distance, K2P_distance_ambiguity
 from functions import read_species, read_fasta, compute_frequencies, remove_duplicates, compute_groups, run_processes, \
     compute_individual_groups
 
+COPYRIGHT = """
+Hooty: fast DNA distance matrix
+Copyright (C) 2024  Andrea Princic & Giacomo Chiappa
+"""
+
 
 def main(parser) -> int:
+    print(COPYRIGHT)
+    
     args = parser.parse_args()
     start = time.time()
 
