@@ -75,7 +75,7 @@ def read_fasta(fasta_file, species, groups) -> list[Sequence]:
         lines = convert_to_single_lines(lines)
 
     seqs = list()
-    fatal_error = False
+    # fatal_error = False
     for l in range(0, len(lines), 2):
         name = lines[l][1:].strip()
         of_groups = set()
@@ -88,16 +88,15 @@ def read_fasta(fasta_file, species, groups) -> list[Sequence]:
             seqs.append(Sequence(l, of_group, name, to_bytes(lines[l + 1].strip())))
         elif of_n_groups > 1:
             of_species = ", ".join(map(lambda g: species[g], of_groups))
-            print(f"Error: species of sequence {name} is not unique. Found matches for: {of_species}")
-            fatal_error = True
-        elif of_n_groups == 0:
-            # print(f"Warning: match not found for sequence '{name}'")
-            pass
+            print(f"WARNING: species of sequence {name} is not unique. Found matches for: {of_species}")
+            # fatal_error = True
+        elif of_n_groups == 0 and len(name) > 0:
+            print(f"WARNING: match not found for sequence '{name}'")
     # if fatal_error:
     #     exit(1)
 
     if any(len(seq.seq) != len(seqs[0].seq) for seq in seqs):
-        print("Error: sequences in fasta file are not of equal length")
+        print("ERROR: sequences in fasta file are not of equal length")
         exit(1)
 
     return seqs
