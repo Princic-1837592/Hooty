@@ -39,6 +39,14 @@ def main() -> int:
         widget="FileChooser",
     )
     parser.add_argument(
+        "-f",
+        "--full-matrix",
+        metavar="Full matrix",
+        default=None,
+        help="compute distances for all sequences",
+        dest="full_matrix",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         metavar="Output file",
@@ -55,13 +63,13 @@ def main() -> int:
         widget="IntegerField",
     )
     parser.add_argument(
-        "-u",
-        "--unambiguous",
-        metavar="Unambiguous",
-        default=False,
-        action="store_true",
-        help="ignore ambiguous bases",
-        dest="unambiguous",
+        "-s",
+        "--sep",
+        metavar="Separator",
+        choices=list(printers.SEPARATORS.keys()),
+        default=printers.DEFAULT_SEPARATOR,
+        help="separator for the output file",
+        dest="separator",
     )
     parser.add_argument(
         "-t",
@@ -73,21 +81,13 @@ def main() -> int:
         type=float,
     )
     parser.add_argument(
-        "-f",
-        "--full-matrix",
-        metavar="Full matrix",
-        default=None,
-        help="compute distances for all sequences",
-        dest="full_matrix",
-    )
-    parser.add_argument(
-        "-s",
-        "--sep",
-        metavar="Separator",
-        choices=list(printers.SEPARATORS.keys()),
-        default=printers.DEFAULT_SEPARATOR,
-        help="separator for the output file",
-        dest="separator",
+        "-u",
+        "--unambiguous",
+        metavar="Unambiguous",
+        default=False,
+        action="store_true",
+        help="treat ambiguous sites as similarities",
+        dest="unambiguous",
     )
     return Gooey(
         program_name="Hooty",
