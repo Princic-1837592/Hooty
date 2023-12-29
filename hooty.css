@@ -1,5 +1,5 @@
 #hooty {
-    margin-left: -100px;
+    margin-left: -5em;
     color: #bd752b;
 
     &:hover #hoot-hoot {
@@ -22,7 +22,7 @@
     max-height: 300px;
     white-space: nowrap;
     animation-name: move-right;
-    animation-duration: 15s;
+    animation-duration: 7s;
     animation-iteration-count: 1;
     animation-timing-function: linear;
 }
