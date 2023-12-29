@@ -1,0 +1,18 @@
+body {
+    background-color: #191a1c;
+    color: white;
+}
+
+.monospace {
+    line-height: 100%;
+    font-family: monospace;
+}
+
+.no-select {
+    user-select: none;
+}
+
+#info {
+    font-size: 20px;
+    margin-left: 50px;
+}
