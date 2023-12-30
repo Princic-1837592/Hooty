@@ -43,7 +43,7 @@ def format_cell(cell, precision):
     vals = []
     for val in cell if type(cell) == tuple else (cell,):
         vals.append(format_value(val, precision))
-    return " – ".join(vals)
+    return " - ".join(vals)
 
 
 def format_value(val, precision):

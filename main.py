@@ -91,7 +91,7 @@ def main(parser) -> int:
     string = printers.to_sv(result, species, groups, args.separator, 2)
     if args.output_file is None:
         args.output_file = os.path.splitext(args.fasta_file)[0] + ".csv"
-    with open(args.output_file, "w", encoding="utf-8") as f:
+    with open(args.output_file, "w") as f:
         f.write(string)
     print(f"Output written to {args.output_file}")
 
@@ -115,7 +115,7 @@ def main(parser) -> int:
             args.separator,
             15
         )
-        with open(args.full_matrix, "w", encoding="utf-8") as f:
+        with open(args.full_matrix, "w") as f:
             f.write(string)
         print(f"Full matrix written to {args.full_matrix}")
 
