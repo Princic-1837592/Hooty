@@ -14,7 +14,7 @@ class CodeWide extends HTMLElement {
         description.innerText = 'Copy';
 
         copy.addEventListener('click', async () => {
-            await navigator.clipboard.writeText(this.innerText);
+            await navigator.clipboard.writeText(this.lastChild.textContent.trim());
         });
 
         copy.appendChild(copy_front);
