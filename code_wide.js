@@ -24,5 +24,4 @@ class CodeWide extends HTMLElement {
     }
 }
 
-// Registra il nuovo elemento personalizzato
 customElements.define('code-wide', CodeWide);
