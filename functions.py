@@ -67,7 +67,7 @@ def to_bytes(sequence: str) -> bytes:
 
 def read_fasta(fasta_file: str, species, groups) -> list[Sequence]:
     with open(fasta_file, "r") as f:
-        lines = f.read().strip().splitlines()
+        lines = list(filter(lambda line: len(line) > 0, f.read().strip().splitlines()))
     # if len(lines) % 2 != 0:
     #     print("Error: fasta file is not in correct format")
     #     return None
