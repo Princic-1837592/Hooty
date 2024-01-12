@@ -4,23 +4,25 @@ class CodeWide extends HTMLElement {
     }
 
     connectedCallback() {
-        const copy = document.createElement('div');
-        copy.classList.add('copy-code');
-        const copy_front = document.createElement('div');
-        copy_front.classList.add('front');
-        const copy_back = document.createElement('div');
-        copy_back.classList.add('back');
-        const description = document.createElement('span');
-        description.innerText = 'Copy';
+        if (this.getAttribute("no-copy") === null) {
+            const copy = document.createElement('div');
+            copy.classList.add('copy-code');
+            const copy_front = document.createElement('div');
+            copy_front.classList.add('front');
+            const copy_back = document.createElement('div');
+            copy_back.classList.add('back');
+            const description = document.createElement('span');
+            description.innerText = 'Copy';
 
-        copy.addEventListener('click', async () => {
-            await navigator.clipboard.writeText(this.lastChild.textContent.trim());
-        });
+            copy.addEventListener('click', async () => {
+                await navigator.clipboard.writeText(this.lastChild.textContent.trim());
+            });
 
-        copy.appendChild(copy_front);
-        copy.appendChild(copy_back);
-        copy.appendChild(description);
-        this.appendChild(copy);
+            copy.appendChild(copy_front);
+            copy.appendChild(copy_back);
+            copy.appendChild(description);
+            this.appendChild(copy);
+        }
     }
 }
 
