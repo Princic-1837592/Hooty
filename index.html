@@ -130,16 +130,53 @@
 
     <div class="section" id="input-files">
         <h2>INPUT FILES</h2>
-        <p>
-            <code class="inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
-            Sequences must have the same length.
-            Sequence name must refer to a species in the species file.
-        </p>
-        <p>
-            <code class="inline">&lt;species file&gt;</code> a line separated file containing one group per line.
-            Each group must be unique and non overlap with other groups.
-            Multiple names for the same group must be on the same line, separated by commas.
-        </p>
+        <ul class="large">
+            <li>
+                <p>
+                    <code class="inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
+                    Sequences must have the same length.
+                    Sequence name must refer to a species in the species file.
+                </p>
+                <code-wide>
+                    >COD-001_species01 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;———
+                    sample name<br>
+                    CACACTCTATTTAATTTTTGGTATTTGAGCCGGGCTAGTCGGAACCGGACTCRGCCTACT<br>
+                    AATCCGAGCAGAACTTAGTCAGCCCGGAACTTTACTAGGGGACGATCAACTATATAATGT &nbsp;&nbsp;&nbsp;&nbsp;——— DNA
+                    sequence<br>
+                    GGTTGTCACTGCTCACGCATTTATCATAATTTTCTTCTTAGTAATACCGTTAATAATTGG<br>
+                    CGGATTCGGAAATTGATTAGTCCCATTAATATTAGGTGCTCCAGATATAGCCTTTCCTCG<br>
+                    AATAAACAACATAAGATTTTGATTACTACCTCCATCACTAACACTACTATTAACCTCAGC<br>
+                    >COD-002_species01 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;———
+                    sample name<br>
+                    CACACTCTATTTAATTTTTGGTATTTGAGCCGGGCTAGTCGGAACCGGACTCAGCCTACT<br>
+                    AATCCGAGCAGAACTTAGTCAGCCCGGAACTTTACTAGGGGACGATCAACTATATAATGT &nbsp;&nbsp;&nbsp;&nbsp;——— DNA
+                    sequence<br>
+                    GGTTGTCACTGCTCACGCATTTATCATAATTTTCTTCTTASTAATACCGTTAATAATTGG<br>
+                    CGRATTCGGAAATTGATTAGTCCCATTAATATTAGGTGCTCCAGATATAGCCTTTCCTCG<br>
+                    AATAAACAACATAAGATTTTGATTACTACCTCCATCACTAACACTACTATTAACCTCAGC<br>
+                </code-wide>
+            </li>
+            <li>
+                <p>
+                    <code class="inline">&lt;species file&gt;</code> a line separated file containing one group per
+                    line.
+                    Each group must be unique and non overlap with other groups.
+                </p>
+                <code-wide>
+                    species01<br>
+                    species02<br>
+                    species03<br>
+                    species04<br>
+                </code-wide>
+                <p>Multiple names for the same group must be on the same line, separated by commas.</p>
+                <code-wide>
+                    species01<br>
+                    species02a, species02b<br>
+                    species03a, species03b, species03c<br>
+                    species04<br>
+                </code-wide>
+            </li>
+        </ul>
     </div>
 
     <div class="section" id="options">
