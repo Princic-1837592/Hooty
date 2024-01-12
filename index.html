@@ -121,11 +121,11 @@
     <div class="section" id="synopsis">
         <h2>SYNOPSIS</h2>
         <code-wide>
-            python3 hooty.py &lt;fasta_file&gt; &lt;species_file&gt; [OPTIONS]
+            python3 hooty.py &lt;fasta_file&gt; &lt;partition_file&gt; [OPTIONS]
         </code-wide>
         To use via graphical interface:
         <code-wide>
-            python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;species_file&gt;] [OPTIONS]
+            python3 hooty_gui.py [&lt;fasta_file&gt;] [&lt;partition_file&gt;] [OPTIONS]
         </code-wide>
     </div>
 
@@ -136,33 +136,46 @@
                 <p>
                     <code class="inline">&lt;fasta file&gt;</code> a file containing the sequences to be analyzed.
                     Sequences must have the same length.
-                    Sequence name must refer to a species in the species file.
+                    Sequence names should refer to a name in the partition file.
                 </p>
                 <code-wide>
-                    >COD-001_species01 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;———
-                    sample name<br>
-                    CACACTCTATTTAATTTTTGGTATTTGAGCCGGGCTAGTCGGAACCGGACTCRGCCTACT<br>
-                    AATCCGAGCAGAACTTAGTCAGCCCGGAACTTTACTAGGGGACGATCAACTATATAATGT &nbsp;&nbsp;&nbsp;&nbsp;——— DNA
-                    sequence<br>
-                    GGTTGTCACTGCTCACGCATTTATCATAATTTTCTTCTTAGTAATACCGTTAATAATTGG<br>
-                    CGGATTCGGAAATTGATTAGTCCCATTAATATTAGGTGCTCCAGATATAGCCTTTCCTCG<br>
-                    AATAAACAACATAAGATTTTGATTACTACCTCCATCACTAACACTACTATTAACCTCAGC<br>
-                    >COD-002_species01 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;———
-                    sample name<br>
-                    CACACTCTATTTAATTTTTGGTATTTGAGCCGGGCTAGTCGGAACCGGACTCAGCCTACT<br>
-                    AATCCGAGCAGAACTTAGTCAGCCCGGAACTTTACTAGGGGACGATCAACTATATAATGT &nbsp;&nbsp;&nbsp;&nbsp;——— DNA
-                    sequence<br>
-                    GGTTGTCACTGCTCACGCATTTATCATAATTTTCTTCTTASTAATACCGTTAATAATTGG<br>
-                    CGRATTCGGAAATTGATTAGTCCCATTAATATTAGGTGCTCCAGATATAGCCTTTCCTCG<br>
-                    AATAAACAACATAAGATTTTGATTACTACCTCCATCACTAACACTACTATTAACCTCAGC<br>
+                    >COD-001_species01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#x251c;&#x2500;&#x2500;
+                    sequence name<br>
+                    CACACTCTATTTAATTTTTGGTATTTGAGCCGGGCTAGTCGGAACCGGACTCRGCCTACT&nbsp;&#x2500;&#x2500;&#x2510;<br>
+                    AATCCGAGCAGAACTTAGTCAGCCCGGAACTTTACTAGGGGACGATCAACTATATAATGT&nbsp;&nbsp;&nbsp;&#x251C;&#x2500;&#x2500;
+                    DNA sequence<br>
+                    GGTTGTCACTGCTCACGCATTTATCATAATTTTCTTCTTAGTAATACCGTTAATAATTGG&nbsp;&nbsp;&nbsp;&#x2502;<br>
+                    CGGATTCGGAAATTGATTAGTCCCATTAATATTAGGTGCTCCAGATATAGCCTTTCCTCG&nbsp;&nbsp;&nbsp;&#x2502;<br>
+                    AATAAACAACATAAGATTTTGATTACTACCTCCATCACTAACACTACTATTAACCTCAGC&nbsp;&#x2500;&#x2500;&#x2518;<br>
+                    >COD-002_species01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#x251c;&#x2500;&#x2500;
+                    sequence name<br>
+                    CACACTCTATTTAATTTTTGGTATTTGAGCCGGGCTAGTCGGAACCGGACTCAGCCTACT&nbsp;&#x2500;&#x2500;&#x2510;<br>
+                    AATCCGAGCAGAACTTAGTCAGCCCGGAACTTTACTAGGGGACGATCAACTATATAATGT&nbsp;&nbsp;&nbsp;&#x251C;&#x2500;&#x2500;
+                    DNA sequence<br>
+                    GGTTGTCACTGCTCACGCATTTATCATAATTTTCTTCTTASTAATACCGTTAATAATTGG&nbsp;&nbsp;&nbsp;&#x2502;<br>
+                    CGRATTCGGAAATTGATTAGTCCCATTAATATTAGGTGCTCCAGATATAGCCTTTCCTCG&nbsp;&nbsp;&nbsp;&#x2502;<br>
+                    AATAAACAACATAAGATTTTGATTACTACCTCCATCACTAACACTACTATTAACCTCAGC&nbsp;&#x2500;&#x2500;&#x2518;<br>
                 </code-wide>
             </li>
             <li>
                 <p>
-                    <code class="inline">&lt;species file&gt;</code> a line separated file containing one group per
-                    line.
-                    Each group must be unique and non overlap with other groups.
+                    <code class="inline">&lt;partition file&gt;</code> a line separated file containing one group per
+                    line. Please pay attention to the following:
                 </p>
+                <ul>
+                    <li>
+                        A name can appear in only one group.
+                    </li>
+                    <li>
+                        Name matching is case-sensitive
+                        (<code class="inline">species01</code> is different from <code class="inline">Species01</code>).
+                    </li>
+                    <li>
+                        A name should not be substring of another
+                        (having something like <code class="inline"><u>species1</u></code> and
+                        <code class="inline"><u>species1</u>1</code> could result in an error)
+                    </li>
+                </ul>
                 <code-wide>
                     species01<br>
                     species02<br>
