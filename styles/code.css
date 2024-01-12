@@ -1,6 +1,6 @@
 code, code-wide {
     background-color: #32353c;
-    border-radius: 7px;
+    border-radius: 5px;
 }
 
 code-wide {
@@ -14,11 +14,11 @@ code-wide {
 }
 
 code.inline {
-    padding: 5px;
+    padding: 3px;
 }
 
 code.title {
-    margin-right: 10px;
+    margin-right: 5px;
 }
 
 * > code-wide {
