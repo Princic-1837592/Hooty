@@ -5,6 +5,45 @@
     &:hover #hoot-hoot {
         visibility: visible;
     }
+
+    .hooty-eye-container {
+        position: relative;
+
+        .hooty-eye-ball {
+            position: absolute;
+            display: inline-block;
+            width: 2ch;
+            height: 2ch;
+            left: -0.5ch;
+            border-radius: 50%;
+            border: 2px solid rgba(189, 117, 43, 0.68);
+            box-sizing: border-box;
+
+            &::after {
+                content: "";
+                display: inline;
+                position: absolute;
+                width: 0.6ch;
+                height: 0.6ch;
+                background: white;
+                border-radius: 50%;
+                top: calc(50% - 0.25ch);
+                font-size: 110%;
+                transition-duration: 1s;
+            }
+
+            &.rotating::after {
+                right: 5%;
+            }
+
+            &.staring::after {
+                right: calc(50% - 0.5ch);
+                top: calc(50% - 0.5ch);
+                width: 1ch;
+                height: 1ch;
+            }
+        }
+    }
 }
 
 #hoot-hoot {
