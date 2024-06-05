@@ -11,6 +11,8 @@ code-wide {
     margin-inline-end: 0;
     padding: 20px;
     font-family: monospace;
+    white-space: nowrap;
+    min-width: max-content;
 }
 
 code.inline {
