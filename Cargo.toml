@@ -1,6 +1,6 @@
 [package]
 name = "hooty"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2024"
 authors = ["Andrea Princic <andreapri.99@gmail.com>"]
 license-file = "LICENSE"
@@ -9,6 +9,7 @@ homepage = "https://princic-1837592.github.io/Hooty/"
 repository = "https://github.com/Princic-1837592/Hooty"
 readme = "README.md"
 keywords = ["k2p", "distance", "ambiguous", "nucleotides", "bioinformatics"]
+exclude = ["examples"]
 
 [dependencies]
 clap = { version = "4.5.39", features = ["derive"] }
