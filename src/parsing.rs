@@ -1,25 +1,23 @@
-use crate::structs::{AmbiguityInfo, Base, Frequencies, Offset, Sequence, REPLACEMENTS};
-use std::collections::HashSet;
-use std::path::Path;
+use std::{collections::HashSet, path::Path};
+
+use crate::structs::{AmbiguityInfo, Base, Frequencies, Offset, REPLACEMENTS, Sequence};
 
 pub(crate) fn read_species<P: AsRef<Path>>(path: P) -> (Vec<String>, Vec<usize>, Vec<usize>) {
 	let mut species = Vec::new();
 	let mut groups = Vec::new();
 	let mut offsets = Vec::new();
 	let file = std::fs::read_to_string(path).expect("Failed to read species file");
-	let mut group = 0;
-	for line in file.lines() {
+	for (group, line) in file.lines().enumerate() {
 		offsets.push(species.len());
 		for s in line.split(',').map(&str::trim) {
 			groups.push(group);
 			species.push(s.to_owned());
 		}
-		group += 1;
 	}
 	(species, groups, offsets)
 }
 
-fn to_single_lines<'a>(mut file: String) -> Vec<String> {
+fn to_single_lines(mut file: String) -> Vec<String> {
 	file.push_str("\n>");
 	let mut buffer = "".to_owned();
 	let mut result = Vec::from([file
@@ -42,11 +40,11 @@ fn to_single_lines<'a>(mut file: String) -> Vec<String> {
 
 pub(crate) fn read_fasta<P: AsRef<Path>>(
 	path: P,
-	species: &Vec<String>,
-	groups: &Vec<usize>,
+	species: &[String],
+	groups: &[usize],
 ) -> Vec<Sequence> {
 	let file = std::fs::read_to_string(path).expect("Failed to read fasta file");
-	let first_three: Vec<_> = file.lines().filter(|l| l.len() > 0).take(3).collect();
+	let first_three: Vec<_> = file.lines().filter(|l| !l.is_empty()).take(3).collect();
 	let lines: Vec<_> = if first_three.len() > 2
 		&& first_three[2]
 			.chars()
@@ -57,7 +55,7 @@ pub(crate) fn read_fasta<P: AsRef<Path>>(
 		to_single_lines(file)
 	} else {
 		file.lines()
-			.filter_map(|l| (l.len() > 0).then_some(l.to_owned()))
+			.filter_map(|l| (!l.is_empty()).then_some(l.to_owned()))
 			.collect()
 	};
 
@@ -77,7 +75,7 @@ pub(crate) fn read_fasta<P: AsRef<Path>>(
 				seq: lines[l + 1].chars().map(Base::from).collect(),
 			}),
 			0 => {
-				eprintln!("WARNING: match not found for sequence '{}'", name)
+				eprintln!("WARNING: match not found for sequence '{name}'")
 			}
 			_ => {
 				eprintln!(

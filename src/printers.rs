@@ -2,8 +2,8 @@ use crate::structs::Separator;
 
 #[allow(private_bounds)]
 pub(crate) fn to_sv(
-	matrix: &Vec<Vec<impl Cell>>,
-	species: &Vec<String>,
+	matrix: &[Vec<impl Cell>],
+	species: &[String],
 	groups: &Vec<usize>,
 	separator: Separator,
 	precision: usize,
@@ -22,7 +22,7 @@ pub(crate) fn to_sv(
 			.map(|c| c.format(precision))
 			.collect::<Vec<_>>()
 			.join(separator);
-		lines.push(format!("{}{}{}", group, separator, numbers));
+		lines.push(format!("{group}{separator}{numbers}"));
 	}
 	lines.join("\n")
 }

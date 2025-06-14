@@ -4,7 +4,7 @@ const TRANSITIONS: [[u8; 4]; 4] = [[0, 0, 1, 0], [0, 0, 0, 1], [1, 0, 0, 0], [0,
 
 pub(crate) fn k2p(seq1: &Sequence, seq2: &Sequence, _: Option<&AmbiguityInfo>) -> f64 {
 	let pairs = seq1.seq.iter().zip(&seq2.seq).filter(|&(&b1, &b2)| {
-		b1 != GAP && b1 != N && b1 != NoneBase && b2 != GAP && b2 != N && b2 != NoneBase
+		b1 != Gap && b1 != N && b1 != NoneBase && b2 != Gap && b2 != N && b2 != NoneBase
 	});
 	let (mut ts_count, mut tv_count, length) = (0, 0, pairs.clone().count());
 	if length == 0 {
@@ -32,7 +32,7 @@ pub(crate) fn k2p_ambiguity(
 		.zip(&seq2.seq)
 		.enumerate()
 		.filter(|&(_, (&b1, &b2))| {
-			b1 != GAP && b1 != N && b1 != NoneBase && b2 != GAP && b2 != N && b2 != NoneBase
+			b1 != Gap && b1 != N && b1 != NoneBase && b2 != Gap && b2 != N && b2 != NoneBase
 		});
 	let (mut ts_count, mut ts_count_f, mut tv_count, mut tv_count_f, mut length) =
 		(0, 0.0, 0, 0.0, pairs.clone().count());

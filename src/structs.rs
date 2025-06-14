@@ -1,7 +1,10 @@
-use clap::ValueEnum;
-use std::hash::{Hash, Hasher};
-use std::ops::Index;
+use std::{
+	hash::{Hash, Hasher},
+	ops::Index,
+};
+
 use Base::*;
+use clap::ValueEnum;
 
 #[derive(Eq, Debug, Clone)]
 pub(crate) struct Sequence {
@@ -41,7 +44,8 @@ pub(crate) enum Base {
 	H,
 	V,
 	N,
-	GAP,
+	Gap,
+	#[allow(clippy::enum_variant_names)]
 	NoneBase,
 }
 
@@ -63,7 +67,7 @@ impl From<char> for Base {
 			'H' => H,
 			'V' => V,
 			'N' => N,
-			_gap => GAP,
+			_gap => Gap,
 		}
 	}
 }

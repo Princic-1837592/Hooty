@@ -1,18 +1,23 @@
-use crate::structs::{AmbiguityInfo, Separator, Sequence};
-use rayon::iter::ParallelIterator;
 use std::time::Instant;
+
+use rayon::iter::ParallelIterator;
+
+use crate::structs::Separator;
 
 mod distances;
 mod parsing;
 mod printers;
 mod structs;
 
-use crate::distances::{k2p, k2p_ambiguity};
-use crate::parsing::{
-	compute_frequencies, get_output_file_path, read_fasta, read_species, remove_duplicates,
-};
-use clap::{arg, Parser};
+use clap::{Parser, arg};
 use rayon::prelude::IntoParallelIterator;
+
+use crate::{
+	distances::{k2p, k2p_ambiguity},
+	parsing::{
+		compute_frequencies, get_output_file_path, read_fasta, read_species, remove_duplicates,
+	},
+};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -58,32 +63,24 @@ fn main() {
 	let args = Args::parse();
 
 	let (species, groups, group_offsets) = read_species(args.species_file);
-	// dbg!(&species);
-	// dbg!(&groups);
-	// dbg!(&group_offsets);
 	let n_groups = group_offsets.len();
-	// println!("Number of groups: {}", n_groups);
+	println!("Number of groups: {n_groups}");
 
 	let dup_seqs = read_fasta(&args.fasta_file, &species, &groups);
-	// println!("Number of sequences (with duplicates): {}", dup_seqs.len());
+	println!("Number of sequences (with duplicates): {}", dup_seqs.len());
 
-	let (frequencies, distance_f): (_, fn(&Sequence, &Sequence, Option<&AmbiguityInfo>) -> f64) =
-		if args.unambiguous {
-			// println!("Computed frequencies");
-			(None, k2p)
-		} else {
-			let frequencies = Some(compute_frequencies(&dup_seqs, n_groups, args.threshold));
-			(frequencies, k2p_ambiguity)
-		};
+	let (frequencies, distance_f): (_, fn(_, _, _) -> _) = if args.unambiguous {
+		(None, k2p)
+	} else {
+		let frequencies = Some(compute_frequencies(&dup_seqs, n_groups, args.threshold));
+		println!("Computed frequencies");
+		(frequencies, k2p_ambiguity)
+	};
 
 	let (seqs, seqs_offsets, min_dist_0) = remove_duplicates(&dup_seqs, n_groups);
-	// dbg!(&seqs);
-	// dbg!(&seqs_offsets);
-	// dbg!(&min_dist_0);
-	// println!("Number of sequences (without duplicates): {}", seqs.len());
+	println!("Number of sequences (without duplicates): {}", seqs.len());
 
 	let mut result: Vec<_> = (0..n_groups)
-		.into_iter()
 		.map(|i| vec![(f64::NAN, f64::NAN); i + 1])
 		.collect();
 	let transposed: Vec<_> = (0..n_groups)
@@ -91,6 +88,7 @@ fn main() {
 		.map(|g1| {
 			let mut result = Vec::with_capacity(n_groups - g1);
 			let g1_offset = seqs_offsets[g1];
+			#[allow(clippy::needless_range_loop)]
 			for g2 in g1..n_groups {
 				let g2_offset = seqs_offsets[g2];
 				let (mut min, mut max) = (f64::INFINITY, f64::NEG_INFINITY);
@@ -142,10 +140,7 @@ fn main() {
 
 	if let Some(full_matrix_path) = args.full_matrix_file {
 		let n_groups = dup_seqs.len();
-		let mut full_result: Vec<_> = (0..n_groups)
-			.into_iter()
-			.map(|i| vec![f64::NAN; i + 1])
-			.collect();
+		let mut full_result: Vec<_> = (0..n_groups).map(|i| vec![f64::NAN; i + 1]).collect();
 		let transposed: Vec<_> = (0..n_groups)
 			.into_par_iter()
 			.map(|g1| {
@@ -168,16 +163,16 @@ fn main() {
 		}
 		let full_result_str = printers::to_sv(
 			&full_result,
-			&dup_seqs.iter().map(|s| s.name.clone()).collect(),
+			&dup_seqs.iter().map(|s| s.name.clone()).collect::<Vec<_>>(),
 			&(0..n_groups).collect(),
 			args.separator,
 			15,
 		);
 		if let Err(e) = std::fs::write(&full_matrix_path, full_result_str) {
-			eprintln!("An error occurred while writing to output: {e}")
+			eprintln!("An error occurred while writing full matrix: {e}")
 		} else {
-			println!("Output written to {full_matrix_path}");
+			println!("Full matrix written to {full_matrix_path}");
 		}
 	}
-	println!("{:?}", Instant::now() - start)
+	println!("Completion time: {:?}", Instant::now() - start)
 }
