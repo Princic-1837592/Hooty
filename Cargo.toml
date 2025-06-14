@@ -1,0 +1,19 @@
+[package]
+name = "Hooty"
+version = "0.0.1"
+edition = "2024"
+authors = ["Andrea Princic <andreapri.99@gmail.com>"]
+license-file = "LICENSE"
+description = "Direct computing of K2P min-max distance matrix"
+homepage = "https://princic-1837592.github.io/Hooty/"
+repository = "https://github.com/Princic-1837592/Hooty"
+readme = "README.md"
+keywords = ["k2p", "distance", "ambiguous", "nucleotides", "bioinformatics"]
+
+[dependencies]
+clap = { version = "4.5.39", features = ["derive"] }
+rayon = "1.10.0"
+
+[[bin]]
+name = "hooty"
+path = "src/main.rs"

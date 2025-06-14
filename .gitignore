@@ -162,3 +162,6 @@ cython_debug/
 tests
 test.py
 evaluation.py
+
+# rust
+/target
